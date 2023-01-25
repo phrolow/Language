@@ -1,0 +1,3 @@
+Y:/gthb/Language/cmake-build-debug/CMakeFiles/Language.dir
+Y:/gthb/Language/cmake-build-debug/CMakeFiles/edit_cache.dir
+Y:/gthb/Language/cmake-build-debug/CMakeFiles/rebuild_cache.dir

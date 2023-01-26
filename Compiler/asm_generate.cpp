@@ -36,7 +36,7 @@ char *ToLine(token_t *token, char *line) {
     return line;
 }
 
-static void *addline(node *nod, FILE *fp) {
+static void addline(node *nod, FILE *fp) {
     char *line = (char*) calloc(MAX_ASM_LINE, sizeof(char*));
 
     if(nod->children[LEFT]) {
@@ -52,7 +52,7 @@ static void *addline(node *nod, FILE *fp) {
     free(line);
 }
 
-void *PrintAsm(tree *code, const char *path) {
+void PrintAsm(tree *code, const char *path) {
     FILE *fp = fopen(path, "w");
 
     addline(code->root, fp);

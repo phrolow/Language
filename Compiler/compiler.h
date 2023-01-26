@@ -6,10 +6,12 @@
 #include "../Onegin/onegin.h"
 #include "../Debug/debug.h"
 
-const char * const 
+const size_t MAX_ASM_LINE = 0x40;
 
-char *ToAsm(tree *code);
+void *PrintAsm(tree *code, const char *path);
 
-char *ToLine(token_t *token);
+const char *GetOpFormat(enum OP op);
+
+char *ToLine(token_t *token, char *line);
 
 #endif //LANGUAGE_COMPILER_H

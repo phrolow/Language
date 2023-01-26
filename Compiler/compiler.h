@@ -8,10 +8,12 @@
 
 const size_t MAX_ASM_LINE = 0x40;
 
-void *PrintAsm(tree *code, const char *path);
+void PrintAsm(tree *code, const char *path);
 
 const char *GetOpFormat(enum OP op);
 
 char *ToLine(token_t *token, char *line);
+
+int language_compile(const char *in, const char *out);
 
 #endif //LANGUAGE_COMPILER_H

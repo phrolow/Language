@@ -18,18 +18,6 @@ DEF_CMD(POW, 5, "^", {
 
 })
 
-DEF_CMD(SIN, 6, "sin", {
-
-})
-
-DEF_CMD(COS, 7, "cos", {
-
-})
-
-DEF_CMD(LN, 8, "ln", {
-
-})
-
 DEF_CMD(WTF, 0, "", {
 
 })

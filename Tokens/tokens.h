@@ -6,7 +6,7 @@
 
 #define DEF_CMD(name, num, sign, ...) name = num,
 
-//const size_t WORD_MAX_LEN = 20;
+const size_t NAME_MAX_LEN = 8;
 const double POISON = 0xDEAD;
 
 enum TYPE {
@@ -30,7 +30,7 @@ enum TOKEN_ERROR {
 union Value {
     enum OP op;
     double num;
-    char name;
+    char name[NAME_MAX_LEN];
 };
 
 struct token_t {

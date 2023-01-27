@@ -46,10 +46,18 @@ node* getV(const char **ptr, side side) {
     assert(ptr && *ptr);
 
     if(isalpha(**ptr)) {
-        char name = **ptr;
-        (*ptr)++;
+        int i = 0;
+        char name[NAME_MAX_LEN] = {};
 
-        NEWNODE(newnode, VAR, {.name = name}, side);
+        do {
+            name[i++] = **ptr;
+
+            (*ptr)++;
+        } while(isalpha(**ptr));
+
+        NEWNODE(newnode, VAR, {.name = {}}, side);
+
+        strcpy(newnode->val->value.name, name);
 
         return newnode;
     }

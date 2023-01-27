@@ -57,7 +57,7 @@ void PrintAsm(tree *code, const char *path) {
 
     addline(code->root, fp);
 
-    fprintf(fp, "HLT\n");
+    fprintf(fp, "OUT\nHLT\n");
 
     fclose(fp);
 }

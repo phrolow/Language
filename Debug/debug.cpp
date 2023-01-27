@@ -18,10 +18,18 @@ static void PrintNode(const node *node, const size_t *nNode, const char color[CO
 
     fprintf(fp, "\tnode%lu [fillcolor=\"%s\", ", *nNode, color);
 
-    if(node->val->type == NUMERAL)
-        fprintf(fp, "label=\"%d %lg\"", node->val->type, node->val->value);
-    else
-        fprintf(fp, "label=\"%d %d\"", node->val->type, node->val->value);
+    switch (node->val->type) {
+        case NUMERAL:
+            fprintf(fp, "label=\"%d %lg\"", node->val->type, node->val->value);
+            break;
+        case VAR:
+            fprintf(fp, "label=\"%d %s\"", node->val->type, node->val->value.name);
+            break;
+        default:
+            fprintf(fp, "label=\"%d %d\"", node->val->type, node->val->value);
+            break;
+    }
+
     fprintf(fp, "];\n");
 
     return;

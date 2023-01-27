@@ -13,7 +13,7 @@ int main(int argc, char **argv) {
     }
 
     language_compile(argv[1], ASM_PATH);
-    system("start Y:/gthb/Language/SoftCPU/asm/asm.exe asm.asm bin.bin");
-    system("start Y:/gthb/Language/SoftCPU/cpu/cpu.exe bin.bin");
+    system("Y:/gthb/Language/SoftCPU/asm/asm.exe ../../asm.asm ../../bin.bin");
+    system("Y:/gthb/Language/SoftCPU/cpu/cpu.exe ../../bin.bin");
     return 0;
 }

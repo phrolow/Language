@@ -12,8 +12,6 @@ node* getN(const char **ptr, side side);
 
 node* getV(const char **ptr, side side);
 
-node* getF(const char **ptr, side side);
-
 node* getPow(const char **ptr, side side);
 
 node* getT(const char **ptr, side side);

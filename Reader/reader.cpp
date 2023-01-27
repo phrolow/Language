@@ -67,37 +67,10 @@ node* getV(const char **ptr, side side) {
     return getN(ptr, side);
 }
 
-node* getF(const char **ptr, side side) {
-    assert(ptr && *ptr);
-
-    enum OP op = WTF;
-
-#include "../codegen.h"
-    ;
-#undef DEF_CMD
-
-    SKIP_SPACES(*ptr);
-
-    node *left = getP(ptr, side);
-
-    if(op == WTF)
-        return left;
-
-    left->side = LEFT;
-
-    NEWNODE(nod, OP, {.op = op}, side);
-
-    NodeConnect(nod, left);
-
-    SKIP_SPACES(*ptr);
-
-    return nod;
-}
-
 node* getPow(const char **ptr, side side) {
     assert(ptr && *ptr);
 
-    node *left = getF(ptr, side);
+    node *left = getP(ptr, side);
 
     SKIP_SPACES(*ptr);
 
@@ -108,7 +81,7 @@ node* getPow(const char **ptr, side side) {
 
         SKIP_SPACES(*ptr);
 
-        node *right = getF(ptr, RIGHT);
+        node *right = getP(ptr, RIGHT);
 
         NEWNODE(nod, OP, {.op = POW}, side);
 

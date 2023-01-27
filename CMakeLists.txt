@@ -3,4 +3,4 @@ project(Language)
 
 set(CMAKE_CXX_STANDARD 14)
 
-add_executable(Language Tree/tree.cpp Reader/reader.cpp Debug/debug.cpp Compiler/compiler_main.cpp Tokens/tokens.cpp Onegin/onegin.cpp Compiler/asm_generate.cpp main.cpp SoftCPU/asm/asm_main.cpp config.h)
+add_executable(Language Tree/tree.cpp Reader/reader.cpp Debug/debug.cpp Compiler/compiler_main.cpp Tokens/tokens.cpp Onegin/onegin.cpp Compiler/asm_generate.cpp main.cpp config.h)

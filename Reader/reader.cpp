@@ -1,265 +1,250 @@
 #include "reader.h"
 
-#define DEF_CMD(name, num, sign, ...)   \
-    if(streq(*ptr, sign)) {             \
-        op = name;                      \
-        (*ptr) += strlen(sign);         \
-    } else
-
 #define KILL {                                                      \
-    printf("INVALID EXPRESSION: %c must not be there\n", **ptr);    \
+    printf("WRONG TOKEN No. %llu\n", *index);                       \
                                                                     \
     assert(0);                                                      \
 }
 
-#define SKIP_SPACES(ptr) \
-    while(isspace(*ptr)) \
-        (ptr)++
-
-#define NEWNODE(name, type, val, side)          \
+#define NEWNODE(name, token, side)          \
     node *name = (node*) malloc(sizeof(node));  \
-    token_t *token = NewToken(type, val);       \
-    NodeCtor(name, NULL, token, side);          \
-    printf("%lg\n", token->value.num)
+    NodeCtor(name, NULL, token, side);
+
+#define DEF_KEYW(name, num, sign)          \
+            case KEYW_##name:                  \
+                printf(#sign);  \
+                break;
+
+#define DEF_OPER(name, num, sign)                   \
+            case KEYW_##name:                      \
+                printf(#sign);     \
+                break;
+
+#define DEF_HELP(name, num, sign)                   \
+            case KEYW_##name:                      \
+                printf("%c\n", sign);      \
+                break;
 
 
+token_t *require(token_stk_t *tokens, size_t *index, KEYW keyw) {
+    assert(tokens && tokens->tokens && index);
 
-node* getN(const char **ptr, side side) {
-    assert(ptr && *ptr);
+    token_t *token = TokensElem(tokens, *index);
 
-    if(!isdigit(**ptr)) KILL
+    if(token->type != KEYWORD_TYPE || token->value.keyword != keyw) {
+        printf("INVALID SYNTAX: at %llu required ");
 
-    double val = 0;
+        switch (keyw) {
+            #include "../keywords.h"
+            #include "../operators.h"
+            default:
+                printf("... what?)");
+                break;
+        }
 
-    while(isdigit(**ptr)) {
-        val = val * 10 + **ptr - '0';
+        #undef DEF_KEYW
+        #undef DEF_OPER
+        #undef DEF_HELP
 
-        (*ptr)++;
+        assert(0);
     }
 
-    NEWNODE(newnode, NUM_TYPE, {.num = val}, side);
+    (*index)++;
 
-    SKIP_SPACES(*ptr);
+    return token;
+}
+
+node *getToken(token_stk_t *tokens, size_t *index, side side) {
+    assert(tokens && tokens->tokens && index);
+
+    token_t *token = TokensElem(tokens, *index);
+
+    NEWNODE(newnode, token, side);
+
+    (*index)++;
 
     return newnode;
 }
 
-node* getV(const char **ptr, side side) {
-    assert(ptr && *ptr);
+node* getN(token_stk_t *tokens, size_t *index, side side) {
+    assert(tokens && tokens->tokens && index);
 
-    if(isalpha(**ptr)) {
-        int i = 0;
-        char name[NAME_MAX_LEN] = {};
+    token_t *token = TokensElem(tokens, *index);
 
-        do {
-            name[i++] = **ptr;
+    if(token->type != NUM_TYPE) KILL
 
-            (*ptr)++;
-        } while(isalpha(**ptr));
-
-        NEWNODE(newnode, VAR_TYPE, {.name = {}}, side);
-
-        strcpy(newnode->val->value.name, name);
-
-        return newnode;
-    }
-
-    SKIP_SPACES(*ptr);
-
-    return getN(ptr, side);
+    return getToken(tokens, index, side);
 }
 
-node* getPow(const char **ptr, side side) {
-    assert(ptr && *ptr);
+node* getV(token_stk_t *tokens, size_t *index, side side) {
+    assert(tokens && tokens->tokens && index);
 
-    node *left = getP(ptr, side);
+    token_t *token = TokensElem(tokens, *index);
 
-    SKIP_SPACES(*ptr);
+    if (token->type == VAR_TYPE)
+        return getToken(tokens, index, side);
 
-    while(**ptr == '^') {
+    return getN(tokens, index, side);
+}
+
+node* getPow(token_stk_t *tokens, size_t *index, side side) {
+    assert(tokens && tokens->tokens && index);
+
+    node *left = getP(tokens, index, side);
+
+    token_t *token = TokensElem(tokens, *index);
+
+    while(token->value.keyword == KEYW_POW) {
+        node *nod = getToken(tokens, index, side);
+
         left->side = LEFT;
 
-        (*ptr)++;
-
-        SKIP_SPACES(*ptr);
-
-        node *right = getP(ptr, RIGHT);
-
-        NEWNODE(nod, KEYWORD_TYPE, {.keyword = KEYW_POW}, side);
+        node *right = getP(tokens, index, RIGHT);
 
         NodeConnect(nod, left);
         NodeConnect(nod, right);
 
         left = nod;
+        token = TokensElem(tokens, *index);
     }
-
-    SKIP_SPACES(*ptr);
 
     return left;
 }
 
-node* getT(const char **ptr, side side) {
-    assert(ptr && *ptr);
+node* getT(token_stk_t *tokens, size_t *index, side side) {
+    assert(tokens && tokens->tokens && index);
 
-    node *left = getPow(ptr, side);
+    node *left = getPow(tokens, index, side);
 
-    SKIP_SPACES(*ptr);
+    token_t *token = TokensElem(tokens, *index);
 
-    while(**ptr == '*' || **ptr == '/') {
-        enum KEYW op;
+    while(token->value.keyword == KEYW_MUL || token->value.keyword == KEYW_DIV) {
+        node *nod = getToken(tokens, index, side);
 
         left->side = LEFT;
 
-        if(**ptr == '*')
-            op = KEYW_MUL;
-        else
-            op = KEYW_DIV;
-
-        (*ptr)++;
-
-        SKIP_SPACES(*ptr);
-
-        node *right = getPow(ptr, RIGHT);
-
-        NEWNODE(nod, KEYWORD_TYPE, {.keyword = op}, side);
+        node *right = getPow(tokens, index, RIGHT);
 
         NodeConnect(nod, left);
         NodeConnect(nod, right);
 
         left = nod;
+        token = TokensElem(tokens, *index);
     }
-
-    SKIP_SPACES(*ptr);
 
     return left;
 }
 
-node* getE(const char **ptr, side side) {
-    assert(ptr && *ptr);
+node* getE(token_stk_t *tokens, size_t *index, side side) {
+    assert(tokens && tokens->tokens && index);
 
-    enum KEYW op;
-    node *left = getT(ptr, side);
+    node *left = getT(tokens, index, side);
 
-    SKIP_SPACES(*ptr);
+    token_t *token = TokensElem(tokens, *index);
 
-    while(**ptr == '+' || **ptr == '-') {
+    while(token->value.keyword == KEYW_ADD || token->value.keyword == KEYW_SUB) {
+        node *nod = getToken(tokens, index, side);
+
         left->side = LEFT;
 
-        if(**ptr == '+')
-            op = KEYW_ADD;
-        else
-            op = KEYW_SUB;
-
-        (*ptr)++;
-
-        SKIP_SPACES(*ptr);
-
-        node *right = getT(ptr, RIGHT);
-
-        NEWNODE(nod, KEYWORD_TYPE, {.keyword = op}, side);
+        node *right = getT(tokens, index, RIGHT);
 
         NodeConnect(nod, left);
         NodeConnect(nod, right);
 
         left = nod;
+        token = TokensElem(tokens, *index);
     }
-
-    SKIP_SPACES(*ptr);
 
     return left;
 }
 
-node *getAssign(const char **ptr, side side) {
-    assert(ptr && *ptr);
+//node *getAssign(token_stk_t *tokens, size_t *index, side side) {
+//    assert(tokens && tokens->tokens && index);
+//
+//    node *left = getV(ptr, LEFT);
+//
+//    SKIP_SPACES(*ptr);
+//
+//    if(**ptr != '=') KILL;
+//
+//    NEWNODE(assign, KEYWORD_TYPE, {.keyword = KEYW_ASSIGN}, side);
+//
+//    (*ptr)++;
+//
+//    SKIP_SPACES(*ptr);
+//
+//    node *right = getE(ptr, RIGHT);
+//
+//    NodeConnect(assign, left);
+//    NodeConnect(assign, right);
+//
+//    SKIP_SPACES(*ptr);
+//
+//
+//
+//    return assign;
+//}
 
-    node *left = getV(ptr, LEFT);
+node* getP(token_stk_t *tokens, size_t *index, side side) {
+    assert(tokens && tokens->tokens && index);
 
-    SKIP_SPACES(*ptr);
+    token_t *token = TokensElem(tokens, *index);
 
-    if(**ptr != '=') KILL;
+    if(token->type != KEYWORD_TYPE || token->value.keyword != KEYW_OPRND)
+        return getV(tokens, index, side);
 
-    NEWNODE(assign, KEYWORD_TYPE, {.keyword = KEYW_ASSIGN}, side);
+    (*index)++;
 
-    (*ptr)++;
+    node *nod = getE(tokens, index, side);
 
-    SKIP_SPACES(*ptr);
+    require(tokens, index, KEYW_CLRND);
 
-    node *right = getE(ptr, RIGHT);
-
-    NodeConnect(assign, left);
-    NodeConnect(assign, right);
-
-    SKIP_SPACES(*ptr);
-
-
-
-    return assign;
+    return nod;
 }
 
-node* getP(const char **ptr, side side) {
-    assert(ptr && *ptr);
+//node *getStmts(token_stk_t *tokens, size_t *index, side side) {
+//    assert(tokens && tokens->tokens && index);
+//
+//    node *left = getAssign(ptr, side);
+//
+//    SKIP_SPACES(*ptr);
+//
+//    while(**ptr == ';') {
+//        left->side = LEFT;
+//
+//        (*ptr)++;
+//
+//        SKIP_SPACES(*ptr);
+//
+//        node *right = getAssign(ptr, RIGHT);
+//
+//        NEWNODE(nod, KEYWORD_TYPE, {.keyword = KEYW_STMT}, side);
+//
+//        NodeConnect(nod, left);
+//        NodeConnect(nod, right);
+//
+//        left = nod;
+//    }
+//
+//    SKIP_SPACES(*ptr);
+//
+//    return left;
+//}
 
-    SKIP_SPACES(*ptr);
+node* getG(token_stk_t *tokens) {
+    assert(tokens);
 
-    if(**ptr == '(') {
-        (*ptr)++;
+    size_t index = 0;
 
-        SKIP_SPACES(*ptr);
-
-        node *nod = getE(ptr, side);
-
-        if(**ptr != ')') KILL
-
-        (*ptr)++;
-
-        SKIP_SPACES(*ptr);
-
-        return nod;
-    }
-    else
-        return getV(ptr, side);
-}
-
-node *getStmts(const char **ptr, side side) {
-    assert(ptr && *ptr);
-
-    node *left = getAssign(ptr, side);
-
-    SKIP_SPACES(*ptr);
-
-    while(**ptr == ';') {
-        left->side = LEFT;
-
-        (*ptr)++;
-
-        SKIP_SPACES(*ptr);
-
-        node *right = getAssign(ptr, RIGHT);
-
-        NEWNODE(nod, KEYWORD_TYPE, {.keyword = KEYW_STMT}, side);
-
-        NodeConnect(nod, left);
-        NodeConnect(nod, right);
-
-        left = nod;
-    }
-
-    SKIP_SPACES(*ptr);
-
-    return left;
-}
-
-node* getG(const char *expression) {
-    assert(expression);
-
-    const char **ptr = &expression;
-
-    SKIP_SPACES(*ptr);
-
-    node *root = getStmts(ptr, ROOT);
+    node *root = getE(tokens, &index, ROOT);
     assert(root);
 
-    if(*expression != '\0') KILL
+    if(tokens->tokens[index].value.keyword != KEYW_EOF) {
+        printf("WRONG TOKEN No. %llu", index);
+
+        assert(0);
+    }
 
     return root;
 }
@@ -269,7 +254,9 @@ tree* ReadExpression(const char *txt) {
 
     token_stk_t *tokens = NewTokenStk();
 
-    TreeCtor(expression, getG(txt));
+
+
+    TreeCtor(expression, getG(tokens));
 
     return expression;
 }

@@ -13,7 +13,7 @@
 
 const size_t NAME_MAX_LEN = 8;
 const double TOKEN_POISON = 0xDEAD;
-const size_t START_CAPACITY = 0x10;
+const size_t MIN_CAPACITY = 0x10;
 const size_t CAPACITY_MULTIPLIER = 2;
 
 enum TYPE {
@@ -28,6 +28,7 @@ enum KEYW {
     #include "../operators.h"
 
 #undef DEF_KEYW
+#undef DEF_OPER
 #undef DEF_HELP
 };
 

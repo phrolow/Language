@@ -4,21 +4,26 @@
 #include "../Onegin/onegin.h"
 #include "../Tree/tree.h"
 #include "../Tokens/tokens.h"
+#include "../TextToTokens/analyzer.h"
 #include <ctype.h>
 
-node* getP(const char **ptr, side side);
+token_t *require(token_stk_t *tokens, size_t *index, KEYW keyw);
 
-node* getN(const char **ptr, side side);
+node *getToken(token_stk_t *tokens, size_t *index, side side);
 
-node* getV(const char **ptr, side side);
+node* getP(token_stk_t *tokens, size_t *index, side side);
 
-node* getPow(const char **ptr, side side);
+node* getN(token_stk_t *tokens, size_t *index, side side);
 
-node* getT(const char **ptr, side side);
+node* getV(token_stk_t *tokens, size_t *index, side side);
 
-node* getE(const char **ptr, side side);
+node* getPow(token_stk_t *tokens, size_t *index, side side);
 
-node* getG(const char *expression);
+node* getT(token_stk_t *tokens, size_t *index, side side);
+
+node* getE(token_stk_t *tokens, size_t *index, side side);
+
+node* getG(token_stk_t *tokens);
 
 tree* ReadExpression(const char *txt);
 

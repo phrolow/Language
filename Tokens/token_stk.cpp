@@ -4,7 +4,7 @@ token_stk_t *NewTokenStk() {
     token_stk_t *tokens = (token_stk_t*) malloc(sizeof(token_stk_t));
 
     tokens->size     = 0;
-    tokens->capacity = START_CAPACITY;
+    tokens->capacity = MIN_CAPACITY;
 
     tokens->tokens    = (token_t *) calloc(tokens->capacity, sizeof(token_t));
 
@@ -54,7 +54,7 @@ void TokensResize  (token_stk_t *tokens)
 {
     assert(CAPACITY_MULTIPLIER > 1);
 
-    size_t new_capacity = START_CAPACITY;
+    size_t new_capacity = MIN_CAPACITY;
 
     if (tokens->size <= tokens->capacity / (int) pow(CAPACITY_MULTIPLIER, 2))
     {
@@ -69,7 +69,7 @@ void TokensResize  (token_stk_t *tokens)
         return;
 
 #define max(a,b) ((a) > (b)) ? (a) : (b)
-    new_capacity = max(new_capacity, START_CAPACITY);
+    new_capacity = max(new_capacity, MIN_CAPACITY);
 #undef max
 
     if (new_capacity == tokens->capacity) return;

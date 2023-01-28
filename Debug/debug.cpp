@@ -47,7 +47,7 @@ static void nodedump(const node *node, size_t *nNode, FILE *fp) {
     assert(fp && nNode);
 
     switch (node->val->type) {
-        case KEYW:
+        case KEYWORD_TYPE:
             PrintNode(node, nNode, OP_COLOR, fp);
             break;
         case NUM_TYPE:

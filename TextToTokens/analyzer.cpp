@@ -1,17 +1,5 @@
 #include "analyzer.h"
 
-int streq(const char *txt, const char *str) {
-    int len = strlen(str);
-
-    for(int i = 0; i < len; i++) {
-        if(*(txt + i) != *(str + i)) {
-            return 0;
-        }
-    }
-
-    return 1;
-}
-
 void skip(char **ptr) {
     while(isspace(**ptr))
         (*ptr)++;
@@ -151,7 +139,7 @@ void getToken(char **ptr, token_stk_t *tokens) {
     TokensPush(tokens, &token);
 }
 
-void GetTokens (const char *filename, token_stk_t *tokens)
+void GetTokens(const char *filename, token_stk_t *tokens)
 {
     assert(filename && tokens);
 

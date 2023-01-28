@@ -13,7 +13,7 @@
 }
 
 #define SKIP_SPACES(ptr) \
-    while(isspace(*ptr))  \
+    while(isspace(*ptr)) \
         (ptr)++
 
 #define NEWNODE(name, type, val, side)          \
@@ -37,7 +37,7 @@ node* getN(const char **ptr, side side) {
         (*ptr)++;
     }
 
-    NEWNODE(newnode, NUMERAL, {.num = val}, side);
+    NEWNODE(newnode, NUM_TYPE, {.num = val}, side);
 
     SKIP_SPACES(*ptr);
 
@@ -57,7 +57,7 @@ node* getV(const char **ptr, side side) {
             (*ptr)++;
         } while(isalpha(**ptr));
 
-        NEWNODE(newnode, VAR, {.name = {}}, side);
+        NEWNODE(newnode, VAR_TYPE, {.name = {}}, side);
 
         strcpy(newnode->val->value.name, name);
 
@@ -85,7 +85,7 @@ node* getPow(const char **ptr, side side) {
 
         node *right = getP(ptr, RIGHT);
 
-        NEWNODE(nod, OP, {.op = POW}, side);
+        NEWNODE(nod, KEYWORD_TYPE, {.keyword = KEYW_POW}, side);
 
         NodeConnect(nod, left);
         NodeConnect(nod, right);
@@ -106,14 +106,14 @@ node* getT(const char **ptr, side side) {
     SKIP_SPACES(*ptr);
 
     while(**ptr == '*' || **ptr == '/') {
-        enum OP op;
+        enum KEYW op;
 
         left->side = LEFT;
 
         if(**ptr == '*')
-            op = MUL;
+            op = KEYW_MUL;
         else
-            op = DIV;
+            op = KEYW_DIV;
 
         (*ptr)++;
 
@@ -121,7 +121,7 @@ node* getT(const char **ptr, side side) {
 
         node *right = getPow(ptr, RIGHT);
 
-        NEWNODE(nod, OP, {.op = op}, side);
+        NEWNODE(nod, KEYWORD_TYPE, {.keyword = op}, side);
 
         NodeConnect(nod, left);
         NodeConnect(nod, right);
@@ -137,7 +137,7 @@ node* getT(const char **ptr, side side) {
 node* getE(const char **ptr, side side) {
     assert(ptr && *ptr);
 
-    enum OP op;
+    enum KEYW op;
     node *left = getT(ptr, side);
 
     SKIP_SPACES(*ptr);
@@ -146,9 +146,9 @@ node* getE(const char **ptr, side side) {
         left->side = LEFT;
 
         if(**ptr == '+')
-            op = ADD;
+            op = KEYW_ADD;
         else
-            op = SUB;
+            op = KEYW_SUB;
 
         (*ptr)++;
 
@@ -156,7 +156,7 @@ node* getE(const char **ptr, side side) {
 
         node *right = getT(ptr, RIGHT);
 
-        NEWNODE(nod, OP, {.op = op}, side);
+        NEWNODE(nod, KEYWORD_TYPE, {.keyword = op}, side);
 
         NodeConnect(nod, left);
         NodeConnect(nod, right);
@@ -178,7 +178,7 @@ node *getAssign(const char **ptr, side side) {
 
     if(**ptr != '=') KILL;
 
-    NEWNODE(assign, OP, {.op = ASSIGN}, side);
+    NEWNODE(assign, KEYWORD_TYPE, {.keyword = KEYW_ASSIGN}, side);
 
     (*ptr)++;
 
@@ -236,7 +236,7 @@ node *getStmts(const char **ptr, side side) {
 
         node *right = getAssign(ptr, RIGHT);
 
-        NEWNODE(nod, OP, {.op = STMT}, side);
+        NEWNODE(nod, KEYWORD_TYPE, {.keyword = KEYW_STMT}, side);
 
         NodeConnect(nod, left);
         NodeConnect(nod, right);
@@ -266,6 +266,8 @@ node* getG(const char *expression) {
 
 tree* ReadExpression(const char *txt) {
     tree *expression = (tree*) malloc(sizeof(tree));
+
+    token_stk_t *tokens = NewTokenStk();
 
     TreeCtor(expression, getG(txt));
 

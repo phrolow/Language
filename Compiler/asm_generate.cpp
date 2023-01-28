@@ -5,10 +5,10 @@
         format = #name;                 \
         break;
 
-//const char *GetOpFormat(enum OP op) {
+//const char *GetOpFormat(enum KEYW keyword) {
 //    const char *format = NULL;
 //
-//    switch (op) {
+//    switch (keyword) {
 //        #include "../codegen.h"
 //        #undef DEF_CMD
 //        default:
@@ -20,14 +20,14 @@
 //
 //char *ToLine(token_t *token, char *line, Compiler *compiler) {
 //    switch (token->type) {
-//        case NUMERAL:
+//        case NUM_TYPE:
 //            sprintf(line, "PUSH %lg\n", token->value.num);
 //            break;
-//        case OP:
-//            sprintf(line, GetOpFormat(token->value.op));
+//        case KEYW:
+//            sprintf(line, GetOpFormat(token->value.keyword));
 //            line = strcat(line, "\n");
 //            break;
-//        case VAR:
+//        case VAR_TYPE:
 //            sprintf(line, "PUSH [%d]\n", VarIndex(token->value.name, compiler));
 //            break;
 //        default:

@@ -19,10 +19,10 @@ static void PrintNode(const node *node, const size_t *nNode, const char color[CO
     fprintf(fp, "\tnode%lu [fillcolor=\"%s\", ", *nNode, color);
 
     switch (node->val->type) {
-        case NUMERAL:
+        case NUM_TYPE:
             fprintf(fp, "label=\"%d %lg\"", node->val->type, node->val->value);
             break;
-        case VAR:
+        case VAR_TYPE:
             fprintf(fp, "label=\"%d %s\"", node->val->type, node->val->value.name);
             break;
         default:
@@ -47,13 +47,13 @@ static void nodedump(const node *node, size_t *nNode, FILE *fp) {
     assert(fp && nNode);
 
     switch (node->val->type) {
-        case OP:
+        case KEYW:
             PrintNode(node, nNode, OP_COLOR, fp);
             break;
-        case NUMERAL:
+        case NUM_TYPE:
             PrintNode(node, nNode, CONST_COLOR, fp);
             break;
-        case VAR:
+        case VAR_TYPE:
             PrintNode(node, nNode, VAR_COLOR, fp);
             break;
         default:
@@ -97,9 +97,9 @@ void TreeDump(tree *tree) {
 //
 //    CHECK(nod->type != NOT_DEFINED, UNDEFINED_TYPE, "undefined type")
 //
-//    CHECK(nod->type != OP || nod->value.op != WTF, UNDEFINED_OP, "not defined op")
+//    CHECK(nod->type != KEYW || nod->value.keyword != WTF, UNDEFINED_OP, "not defined keyword")
 //
-//    CHECK(nod->type != VAR || nod->value.name, NULL_NAME, "null name")
+//    CHECK(nod->type != VAR_TYPE || nod->value.name, NULL_NAME, "null name")
 //
 //    if(nod->children[0]) {
 //        TREE_ERROR le = nodeverify(nod->children[LEFT]);

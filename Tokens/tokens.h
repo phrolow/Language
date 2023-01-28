@@ -7,7 +7,9 @@
 #include <stdlib.h>
 #include <string.h>
 
-#define DEF_KEYW(name, num, sign, ...) name = num,
+#define DEF_KEYW(name, num, sign) KEYW_##name = num,
+#define DEF_OPER(name, num, sign) KEYW_##name = num,
+#define DEF_HELP(name, num, sign) KEYW_##name = num,
 
 const size_t NAME_MAX_LEN = 8;
 const double TOKEN_POISON = 0xDEAD;
@@ -16,14 +18,17 @@ const size_t CAPACITY_MULTIPLIER = 2;
 
 enum TYPE {
     NOT_DEFINED = 0,
-    NUMERAL,
-    VAR,
-    OP,
+    NUM_TYPE,
+    VAR_TYPE,
+    KEYWORD_TYPE,
 };
 
-enum OP {
-    #include "../codegen.h"
-    #undef DEF_KEYW
+enum KEYW {
+    #include "../keywords.h"
+    #include "../operators.h"
+
+#undef DEF_KEYW
+#undef DEF_HELP
 };
 
 enum TOKEN_ERROR {
@@ -33,7 +38,7 @@ enum TOKEN_ERROR {
 };
 
 union Value {
-    enum OP op;
+    enum KEYW keyword;
     double num;
     char name[NAME_MAX_LEN];
 };

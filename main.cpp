@@ -1,4 +1,5 @@
 #include "SoftCPU/asm/asm.h"
+#include "SoftCPU/cpu/cpu.h"
 #include "Compiler/compiler.h"
 #include "config.h"
 
@@ -15,6 +16,7 @@ int main(int argc, char **argv) {
 
     language_compile(argv[1], ASM_PATH);
     run_asm(ASM_PATH, BINPATH);
-    system("Y:/gthb/Language/SoftCPU/cpu/cpu.exe ../../bin.bin");
+    run_cpu(BINPATH);
+
     return 0;
 }

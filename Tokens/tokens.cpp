@@ -13,7 +13,7 @@ token_t *NewToken(TYPE type, Value value) {
 
 void TokenDtor(token_t *token) {
     token->type = NOT_DEFINED;
-    token->value.num = POISON;
+    token->value.num = TOKEN_POISON;
 
     free(token);
 }
@@ -23,7 +23,7 @@ int TokenCheck(token_t *token) {
 
     res |= CHECK(!token, NULLPTR);
     res |= CHECK(token->type == NOT_DEFINED, NO_TYPE);
-    res |= CHECK(token->value.num == POISON, BAD_VAL);
+    res |= CHECK(token->value.num == TOKEN_POISON, BAD_VAL);
 
     return res;
 }

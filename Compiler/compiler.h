@@ -16,7 +16,7 @@ struct Compiler {
 
 void PrintAsm(tree *code, const char *path, Compiler *compiler);
 
-const char *GetOpFormat(enum OP op);
+const char *GetOpFormat(enum KEYW op);
 
 char *ToLine(token_t *token, char *line, Compiler *compiler);
 

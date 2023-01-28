@@ -15,8 +15,8 @@ int main(int argc, char **argv) {
     }
 
     language_compile(argv[1], ASM_PATH);
-    run_asm(ASM_PATH, BINPATH);
-    run_cpu(BINPATH);
+    //run_asm(ASM_PATH, BINPATH);
+    //run_cpu(BINPATH);
 
     return 0;
 }

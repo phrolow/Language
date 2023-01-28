@@ -7,13 +7,13 @@ int language_compile(const char *in, const char *out) {
 
     text txt = textFromFile(in);
 
-    Compiler *compiler = NewCompiler(expression);
+    //Compiler *compiler = NewCompiler(expression);
 
     expression = ReadExpression(txt.content);
 
     TreeDump(expression);
 
-    PrintAsm(expression, out, compiler);
+    //PrintAsm(expression, out, compiler);
 
     TreeDtor(expression);
 

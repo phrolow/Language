@@ -22,6 +22,8 @@
     NodeCtor(name, NULL, token, side);          \
     printf("%lg\n", token->value.num)
 
+
+
 node* getN(const char **ptr, side side) {
     assert(ptr && *ptr);
 
@@ -167,6 +169,33 @@ node* getE(const char **ptr, side side) {
     return left;
 }
 
+node *getAssign(const char **ptr, side side) {
+    assert(ptr && *ptr);
+
+    node *left = getV(ptr, LEFT);
+
+    SKIP_SPACES(*ptr);
+
+    if(**ptr != '=') KILL;
+
+    NEWNODE(assign, OP, {.op = ASSIGN}, side);
+
+    (*ptr)++;
+
+    SKIP_SPACES(*ptr);
+
+    node *right = getE(ptr, RIGHT);
+
+    NodeConnect(assign, left);
+    NodeConnect(assign, right);
+
+    SKIP_SPACES(*ptr);
+
+
+
+    return assign;
+}
+
 node* getP(const char **ptr, side side) {
     assert(ptr && *ptr);
 
@@ -191,6 +220,35 @@ node* getP(const char **ptr, side side) {
         return getV(ptr, side);
 }
 
+node *getStmts(const char **ptr, side side) {
+    assert(ptr && *ptr);
+
+    node *left = getAssign(ptr, side);
+
+    SKIP_SPACES(*ptr);
+
+    while(**ptr == ';') {
+        left->side = LEFT;
+
+        (*ptr)++;
+
+        SKIP_SPACES(*ptr);
+
+        node *right = getAssign(ptr, RIGHT);
+
+        NEWNODE(nod, OP, {.op = STMT}, side);
+
+        NodeConnect(nod, left);
+        NodeConnect(nod, right);
+
+        left = nod;
+    }
+
+    SKIP_SPACES(*ptr);
+
+    return left;
+}
+
 node* getG(const char *expression) {
     assert(expression);
 
@@ -198,7 +256,7 @@ node* getG(const char *expression) {
 
     SKIP_SPACES(*ptr);
 
-    node *root = getE(ptr, ROOT);
+    node *root = getStmts(ptr, ROOT);
     assert(root);
 
     if(*expression != '\0') KILL

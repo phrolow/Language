@@ -63,6 +63,34 @@ token_t *require(token_stk_t *tokens, size_t *index, KEYW keyw) {
     return token;
 }
 
+node *getLogOp(token_stk_t *tokens, size_t *index, side side) {
+    assert(tokens && tokens->tokens && index);
+
+    token_t *token = TokensElem(tokens, *index);
+
+    assert(token->type == KEYWORD_TYPE);
+    assert(token->value.keyword >= KEYW_EQUAL || token->value.keyword <= KEYW_OR);
+
+    return getToken(tokens, index, side);
+}
+
+node *getCondition(token_stk_t *tokens, size_t *index, side side) {
+    assert(tokens && tokens->tokens && index);
+
+    require(tokens, index, KEYW_OPRND);
+
+    node *left = getE(tokens, index, LEFT);
+    node *log_op = getLogOp(tokens, index, side);
+    node *right = getE(tokens, index, RIGHT);
+
+    NodeConnect(log_op, left);
+    NodeConnect(log_op, right);
+
+    require(tokens, index, KEYW_CLRND);
+
+    return log_op; //неправильно как-то....
+}
+
 node *getToken(token_stk_t *tokens, size_t *index, side side) {
     assert(tokens && tokens->tokens && index);
 
@@ -168,6 +196,38 @@ node* getE(token_stk_t *tokens, size_t *index, side side) {
     return left;
 }
 
+node *getIf(token_stk_t *tokens, size_t *index, side side) {
+    assert(tokens && tokens->tokens && index);
+
+    NEWNODE(if_node, require(tokens, index, KEYW_IF), side);
+
+    node *condition = getCondition(tokens, index, LEFT);
+    NodeConnect(if_node, condition);
+
+    node *stmts = getStmts(tokens, index, RIGHT);
+
+    token_t *token = TokensElem(tokens, *index);
+
+    if(token->type == KEYWORD_TYPE && token->value.keyword != KEYW_ELSE) {
+        NodeConnect(if_node, stmts);
+
+        return if_node;
+    }
+
+    node *else_node = getToken(tokens, index, RIGHT);
+
+    NodeConnect(if_node, else_node);
+
+    stmts->side = LEFT;
+
+    node *else_stmts = getStmts(tokens, index, RIGHT);
+
+    NodeConnect(else_node, stmts);
+    NodeConnect(else_node, else_stmts);
+
+    return if_node;
+}
+
 node *getStmt(token_stk_t *tokens, size_t *index, side side) {
     assert(tokens && tokens->tokens && index);
 
@@ -236,12 +296,52 @@ node* getP(token_stk_t *tokens, size_t *index, side side) {
     return nod;
 }
 
+node *getStmts(token_stk_t *tokens, size_t *index, side side) {
+    assert(tokens && tokens->tokens && index);
+
+    token_t *token = TokensElem(tokens, *index);
+
+    require(tokens, index, KEYW_OPFIG);
+
+    token = TokensElem(tokens, *index);
+
+    assert(!(token->type == KEYWORD_TYPE && token->value.keyword == KEYW_CLFIG));
+
+    node    *glob_stmts = NULL,
+            *stmt = NULL,
+            *current = NULL;
+
+    while (*index < tokens->size) {
+        token = TokensElem(tokens, *index);
+
+        if(token->type == KEYWORD_TYPE && token->value.keyword == KEYW_CLFIG) {
+            (*index)++;
+            return glob_stmts;
+        }
+
+        stmt = KeywordNode(KEYW_STMT, side);
+        current = getStmt(tokens, index, RIGHT);
+
+        NodeConnect(stmt, current);
+
+        if(glob_stmts) {
+            glob_stmts->side = LEFT;
+
+            NodeConnect(stmt, glob_stmts);
+        }
+
+        glob_stmts = stmt;
+    }
+
+    return NULL;
+}
+
 node* getG(token_stk_t *tokens) {
     assert(tokens);
 
     size_t index = 0;
 
-    node *root = getStmt(tokens, &index, ROOT);
+    node *root = getStmts(tokens, &index, ROOT);
     assert(root);
 
     if(tokens->tokens[index].value.keyword != KEYW_EOF) {

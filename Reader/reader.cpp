@@ -1,7 +1,7 @@
 #include "reader.h"
 
 #define KILL {                                                      \
-    printf("WRONG TOKEN No. %llu\n", *index);                       \
+    printf("WRONG TOKEN #%llu\n", *index);                       \
                                                                     \
     assert(0);                                                      \
 }
@@ -91,6 +91,73 @@ node *getCondition(token_stk_t *tokens, size_t *index, side side) {
     return log_op; //неправильно как-то....
 }
 
+node *getName(token_stk_t *tokens, size_t *index, side side) {
+    assert(tokens && tokens->tokens && index);
+
+    token_t *token = TokensElem(tokens, *index);
+
+    if(token->type != VAR_TYPE) KILL;
+
+    return getToken(tokens, index, side);
+}
+
+node *getParams(token_stk_t *tokens, size_t *index, side side) {
+    assert(tokens && tokens->tokens && index);
+
+    require(tokens, index, KEYW_OPRND);
+
+    node *expression = getE(tokens, index, LEFT);
+
+    require(tokens, index, KEYW_CLRND);
+
+    node *param = KeywordNode(KEYW_PARAM, side);
+    NodeConnect(param, expression);
+
+    return param;
+}
+
+node *getFuncDef(token_stk_t *tokens, size_t *index, side side) {
+    assert(tokens && tokens->tokens && index);
+
+    token_t *token = TokensElem(tokens, *index);
+
+    int is_main = 0;
+
+    if(token->value.keyword != KEYW_MAIN && token->value.keyword != KEYW_FUNC) KILL;
+
+    if(token->value.keyword == KEYW_MAIN)
+        is_main = 1;
+
+    (*index++);
+
+    token = TokensElem(tokens, *index);
+
+    node *def = KeywordNode(KEYW_DEFINE, side);
+    node *func = KeywordNode(KEYW_FUNC, LEFT);
+    node *name = NULL;
+
+    if(!is_main) {
+        name = KeywordNode(KEYW_MAIN, LEFT);
+    }
+    else {
+        name = getName(tokens, index, LEFT);
+    }
+
+    if(!is_main) {
+        node *params = getParams(tokens, index, RIGHT);
+
+        NodeConnect(func, params);
+    }
+
+    node *stmts = getStmts(tokens, index, RIGHT);
+
+    NodeConnect(func, name);
+    NodeConnect(def, func);
+    NodeConnect(def, stmts);
+
+    return def;
+}
+
 node *getToken(token_stk_t *tokens, size_t *index, side side) {
     assert(tokens && tokens->tokens && index);
 
@@ -120,6 +187,36 @@ node* getV(token_stk_t *tokens, size_t *index, side side) {
 
     if (token->type == VAR_TYPE)
         return getToken(tokens, index, side);
+
+    return getN(tokens, index, side);
+}
+
+node *getF(token_stk_t *tokens, size_t *index, side side) {
+    assert(tokens && tokens->tokens && index);
+
+    token_t *token = TokensElem(tokens, *index);
+
+    if(token->type == VAR_TYPE) {
+        (*index)++;
+
+        token = TokensElem(tokens, *index);
+
+        if(!(token->type == KEYWORD_TYPE && token->value.keyword == KEYW_OPRND)) {
+            (*index)--;
+            return getV(tokens, index, side);
+        }
+
+        (*index)--;
+
+        node *name = getName(tokens, index, LEFT);
+        node *params = getParams(tokens, index, RIGHT);
+        node *call = KeywordNode(KEYW_CALL, side);
+
+        NodeConnect(call, name);
+        NodeConnect(call, params);
+
+        return call;
+    }
 
     return getN(tokens, index, side);
 }
@@ -350,7 +447,7 @@ node* getP(token_stk_t *tokens, size_t *index, side side) {
     token_t *token = TokensElem(tokens, *index);
 
     if(token->type != KEYWORD_TYPE || token->value.keyword != KEYW_OPRND)
-        return getV(tokens, index, side);
+        return getF(tokens, index, side);
 
     (*index)++;
 
@@ -401,12 +498,60 @@ node *getStmts(token_stk_t *tokens, size_t *index, side side) {
     return NULL;
 }
 
+node *getGlobStmts(token_stk_t *tokens, size_t *index, side side) {
+    assert(tokens && tokens->tokens && index);
+
+    token_t *token = NULL;
+
+    node    *glob_stmts = NULL,
+            *current = NULL,
+            *stmt = NULL;
+
+    while (*index < tokens->size) {
+        token = TokensElem(tokens, *index);
+
+        if(token->type == KEYWORD_TYPE && token->value.keyword == EOF)
+            return glob_stmts;
+
+        stmt = KeywordNode(KEYW_STMT, RIGHT);
+
+        if(token->type == VAR_TYPE) {
+            node *var = getName(tokens, index, LEFT);
+            node *assign = getToken(tokens, index, LEFT);
+            node *expression = getE(tokens, index, RIGHT);
+
+            require(tokens, index, KEYW_DOTPOT);
+
+            NodeConnect(assign, var);
+            NodeConnect(assign, expression);
+
+            current = assign;
+        }
+        else if(token->type = KEYWORD_TYPE)
+            current = getFuncDef(tokens, index, LEFT);
+        else KILL;
+
+        if(current)
+            NodeConnect(stmt, current);
+
+        if(glob_stmts) {
+            glob_stmts->side = RIGHT;
+
+            NodeConnect(stmt, glob_stmts);
+        }
+
+        glob_stmts = stmt;
+    }
+
+    return glob_stmts;
+}
+
 node* getG(token_stk_t *tokens) {
     assert(tokens);
 
     size_t index = 0;
 
-    node *root = getStmts(tokens, &index, ROOT);
+    node *root = getGlobStmts(tokens, &index, ROOT);
     assert(root);
 
     if(tokens->tokens[index].value.keyword != KEYW_EOF) {

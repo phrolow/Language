@@ -1,4 +1,4 @@
-DEF_KEYW(MAIN1, 0x100, main)
+DEF_KEYW(MAIN, 0x100, main)
 DEF_KEYW(FUNC, 0x101, function)
 DEF_KEYW(IF, 0x102, if)
 DEF_KEYW(THEN, 0x103, dead)

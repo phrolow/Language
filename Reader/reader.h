@@ -13,6 +13,10 @@ token_t *require(token_stk_t *tokens, size_t *index, KEYW keyw);
 
 node *getToken(token_stk_t *tokens, size_t *index, side side);
 
+node *getCondition(token_stk_t *tokens, size_t *index, side side);
+
+node *getLogOp(token_stk_t *tokens, size_t *index, side side);
+
 node* getP(token_stk_t *tokens, size_t *index, side side);
 
 node* getN(token_stk_t *tokens, size_t *index, side side);
@@ -26,6 +30,8 @@ node* getT(token_stk_t *tokens, size_t *index, side side);
 node* getE(token_stk_t *tokens, size_t *index, side side);
 
 node *getStmt(token_stk_t *tokens, size_t *index, side side);
+
+node *getStmts(token_stk_t *tokens, size_t *index, side side);
 
 node* getG(token_stk_t *tokens);
 

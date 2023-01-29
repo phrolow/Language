@@ -139,13 +139,11 @@ void getToken(char **ptr, token_stk_t *tokens) {
     TokensPush(tokens, &token);
 }
 
-void GetTokens(const char *filename, token_stk_t *tokens)
+void GetTokens(char *txt, token_stk_t *tokens)
 {
-    assert(filename && tokens);
+    assert(txt && tokens);
 
-    text txt = textFromFile(filename);
-
-    char *ptr = txt.content;
+    char *ptr = txt;
 
     do
     {
@@ -157,6 +155,4 @@ void GetTokens(const char *filename, token_stk_t *tokens)
     token.type = KEYWORD_TYPE;
     token.value.keyword = KEYW_EOF;
     TokensPush(tokens, &token);
-
-    free(txt.content);
 }

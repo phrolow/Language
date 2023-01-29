@@ -25,6 +25,15 @@
                 printf("%c\n", sign);      \
                 break;
 
+node *KeywordNode(KEYW keyw, SIDE side) {
+    node *keywordnode = (node *) malloc(sizeof(node));
+
+    token_t *token = NewToken(KEYWORD_TYPE, {.keyword = keyw}); //TODO:
+
+    NodeCtor(keywordnode, NULL, token, side);
+
+    return keywordnode;
+}
 
 token_t *require(token_stk_t *tokens, size_t *index, KEYW keyw) {
     assert(tokens && tokens->tokens && index);
@@ -32,7 +41,7 @@ token_t *require(token_stk_t *tokens, size_t *index, KEYW keyw) {
     token_t *token = TokensElem(tokens, *index);
 
     if(token->type != KEYWORD_TYPE || token->value.keyword != keyw) {
-        printf("INVALID SYNTAX: at %llu required ");
+        printf("INVALID SYNTAX: at %llu required ", *index);
 
         switch (keyw) {
             #include "../keywords.h"
@@ -159,32 +168,56 @@ node* getE(token_stk_t *tokens, size_t *index, side side) {
     return left;
 }
 
-//node *getAssign(token_stk_t *tokens, size_t *index, side side) {
-//    assert(tokens && tokens->tokens && index);
-//
-//    node *left = getV(ptr, LEFT);
-//
-//    SKIP_SPACES(*ptr);
-//
-//    if(**ptr != '=') KILL;
-//
-//    NEWNODE(assign, KEYWORD_TYPE, {.keyword = KEYW_ASSIGN}, side);
-//
-//    (*ptr)++;
-//
-//    SKIP_SPACES(*ptr);
-//
-//    node *right = getE(ptr, RIGHT);
-//
-//    NodeConnect(assign, left);
-//    NodeConnect(assign, right);
-//
-//    SKIP_SPACES(*ptr);
-//
-//
-//
-//    return assign;
-//}
+node *getStmt(token_stk_t *tokens, size_t *index, side side) {
+    assert(tokens && tokens->tokens && index);
+
+    token_t *token = TokensElem(tokens, *index);
+
+    node *stmt_child = NULL;
+
+    if(token->type == VAR_TYPE) {
+        token_t *first = token;
+        (*index)++;
+        token = TokensElem(tokens, *index);
+
+        if(token->type == KEYWORD_TYPE && token->value.keyword == KEYW_ASSIGN) {
+            (*index)--;
+
+            node *var = getV(tokens, index, LEFT);
+            node *assign = getToken(tokens, index, side);
+            node *expression = getE(tokens, index, RIGHT);
+
+            require(tokens, index, KEYW_DOTPOT);
+
+            NodeConnect(assign,var);
+            NodeConnect(assign,expression);
+
+            stmt_child = assign;
+
+            return stmt_child;
+        }
+        else {
+            (*index)--;
+
+            token - first;
+        }
+    }
+    else if(token->type == KEYWORD_TYPE) {
+        switch (token->value.keyword) {
+            case KEYW_IF:
+                return nullptr;
+            default:
+                printf("Чё бля...");
+                assert(0);
+        }
+    }
+
+    stmt_child = getE(tokens, index, side);
+
+    require(tokens, index, KEYW_DOTPOT);
+
+    return stmt_child;
+}
 
 node* getP(token_stk_t *tokens, size_t *index, side side) {
     assert(tokens && tokens->tokens && index);
@@ -203,41 +236,12 @@ node* getP(token_stk_t *tokens, size_t *index, side side) {
     return nod;
 }
 
-//node *getStmts(token_stk_t *tokens, size_t *index, side side) {
-//    assert(tokens && tokens->tokens && index);
-//
-//    node *left = getAssign(ptr, side);
-//
-//    SKIP_SPACES(*ptr);
-//
-//    while(**ptr == ';') {
-//        left->side = LEFT;
-//
-//        (*ptr)++;
-//
-//        SKIP_SPACES(*ptr);
-//
-//        node *right = getAssign(ptr, RIGHT);
-//
-//        NEWNODE(nod, KEYWORD_TYPE, {.keyword = KEYW_STMT}, side);
-//
-//        NodeConnect(nod, left);
-//        NodeConnect(nod, right);
-//
-//        left = nod;
-//    }
-//
-//    SKIP_SPACES(*ptr);
-//
-//    return left;
-//}
-
 node* getG(token_stk_t *tokens) {
     assert(tokens);
 
     size_t index = 0;
 
-    node *root = getE(tokens, &index, ROOT);
+    node *root = getStmt(tokens, &index, ROOT);
     assert(root);
 
     if(tokens->tokens[index].value.keyword != KEYW_EOF) {
@@ -249,12 +253,12 @@ node* getG(token_stk_t *tokens) {
     return root;
 }
 
-tree* ReadExpression(const char *txt) {
+tree* ReadExpression(char *txt) {
     tree *expression = (tree*) malloc(sizeof(tree));
 
     token_stk_t *tokens = NewTokenStk();
 
-
+    GetTokens(txt, tokens);
 
     TreeCtor(expression, getG(tokens));
 

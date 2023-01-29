@@ -18,7 +18,6 @@ void NodeDtor(node *nod) {
     nod->children[0] = NULL;
     nod->children[1] = NULL;
 
-    free(nod->val);
     nod->val = NULL;
 
     free(nod);

@@ -17,5 +17,7 @@ int language_compile(const char *in, const char *out) {
 
     TreeDtor(expression);
 
+    free(txt.content);
+
     return 0;
 }

@@ -45,7 +45,7 @@ void TokensPush(token_stk_t *tokens, const token_t *token) {
 token_t *TokensElem(token_stk_t *tokens, size_t index)
 {
     assert(tokens && tokens->tokens);
-    assert(index >= tokens->size);
+    assert(index < tokens->size);
 
     return tokens->tokens + index;;
 }

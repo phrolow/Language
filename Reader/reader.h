@@ -7,6 +7,8 @@
 #include "../TextToTokens/analyzer.h"
 #include <ctype.h>
 
+node *KeywordNode(KEYW keyw, SIDE side);
+
 token_t *require(token_stk_t *tokens, size_t *index, KEYW keyw);
 
 node *getToken(token_stk_t *tokens, size_t *index, side side);
@@ -23,8 +25,10 @@ node* getT(token_stk_t *tokens, size_t *index, side side);
 
 node* getE(token_stk_t *tokens, size_t *index, side side);
 
+node *getStmt(token_stk_t *tokens, size_t *index, side side);
+
 node* getG(token_stk_t *tokens);
 
-tree* ReadExpression(const char *txt);
+tree* ReadExpression(char *txt);
 
 #endif //LANGUAGE_READER_H

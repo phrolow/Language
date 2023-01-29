@@ -1,4 +1,5 @@
 #include "compiler.h"
+#include "../config.h"
 
 int language_compile(const char *in, const char *out) {
     assert(in && out);
@@ -13,10 +14,9 @@ int language_compile(const char *in, const char *out) {
 
     TreeDump(expression);
 
-    //PrintAsm(expression, out, compiler);
+    GenerateASM(ASM_PATH, expression);
 
     TreeDtor(expression);
-
     free(txt.content);
 
     return 0;

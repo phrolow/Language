@@ -26,7 +26,6 @@ static void PrintNode(const node *node, const size_t *nNode, const char color[CO
             fprintf(fp, "label=\"NAME %s\"", node->val->value.name);
             break;
         case KEYWORD_TYPE:
-
             #define DEF_KEYW(name, num, sign)                                       \
                     case KEYW_##name:                                               \
                         fprintf(fp, "label=\"KEYW %s\"", #name);     \
@@ -40,18 +39,18 @@ static void PrintNode(const node *node, const size_t *nNode, const char color[CO
             #define DEF_HELP(name, num, sign)
 
             switch (node->val->value.keyword) {
-#include "../keywords.h"
+                #include "../keywords.h"
 
-#include "../operators.h"
+                #include "../operators.h"
 
-#undef DEF_KEYW
-#undef DEF_OPER
-#undef DEF_HELP
+                #undef DEF_KEYW
+                #undef DEF_OPER
+                #undef DEF_HELP
                 default:
                     fprintf(fp, "label=\"KEYW ERROR\"");
                     break;
             }
-
+            break;
         default:
             fprintf(fp, "label=\"%d %d\"", node->val->type, node->val->value);
             break;

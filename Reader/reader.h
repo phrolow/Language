@@ -29,6 +29,16 @@ node* getT(token_stk_t *tokens, size_t *index, side side);
 
 node* getE(token_stk_t *tokens, size_t *index, side side);
 
+node *getIf(token_stk_t *tokens, size_t *index, side side);
+
+node *getWhile(token_stk_t *tokens, size_t *index, side side);
+
+node *getReturn(token_stk_t *tokens, size_t *index, side side);
+
+node *getPrint(token_stk_t *tokens, size_t *index, side side);
+
+node *getScan(token_stk_t *tokens, size_t *index, side side);
+
 node *getStmt(token_stk_t *tokens, size_t *index, side side);
 
 node *getStmts(token_stk_t *tokens, size_t *index, side side);

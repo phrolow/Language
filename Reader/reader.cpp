@@ -228,6 +228,63 @@ node *getIf(token_stk_t *tokens, size_t *index, side side) {
     return if_node;
 }
 
+node *getWhile(token_stk_t *tokens, size_t *index, side side) {
+    assert(tokens && tokens->tokens && index);
+
+    node *while_node = getToken(tokens, index, side);
+    node *condition = getCondition(tokens, index, LEFT);
+    node *stmts = getStmts(tokens, index, RIGHT);
+
+    NodeConnect(while_node, condition);
+    NodeConnect(while_node, stmts);
+
+    return while_node;
+}
+
+node *getReturn(token_stk_t *tokens, size_t *index, side side) {
+    assert(tokens && tokens->tokens && index);
+
+    node *return_node = getToken(tokens, index, side);
+
+    if(TokensElem(tokens, *index)->value.keyword != KEYW_DOTPOT) {
+        node *expression = getE(tokens, index, LEFT);
+
+        NodeConnect(return_node, expression);
+    }
+
+    require(tokens, index, KEYW_DOTPOT);
+
+    return return_node;
+}
+
+node *getPrint(token_stk_t *tokens, size_t *index, side side) {
+    assert(tokens && tokens->tokens && index);
+
+    node *print_node = getToken(tokens, index, side);
+
+    node *expression = getE(tokens, index, LEFT);
+
+    NodeConnect(print_node, expression);
+
+    require(tokens, index, KEYW_DOTPOT);
+
+    return print_node;
+}
+
+node *getScan(token_stk_t *tokens, size_t *index, side side) {
+    assert(tokens && tokens->tokens && index);
+
+    node *scan_node = getToken(tokens, index, side);
+
+    node *expression = getV(tokens, index, LEFT);
+
+    NodeConnect(scan_node, expression);
+
+    require(tokens, index, KEYW_DOTPOT);
+
+    return scan_node;
+}
+
 node *getStmt(token_stk_t *tokens, size_t *index, side side) {
     assert(tokens && tokens->tokens && index);
 
@@ -259,13 +316,21 @@ node *getStmt(token_stk_t *tokens, size_t *index, side side) {
         else {
             (*index)--;
 
-            token - first;
+            token = first;
         }
     }
     else if(token->type == KEYWORD_TYPE) {
         switch (token->value.keyword) {
             case KEYW_IF:
-                return nullptr;
+                return getIf(tokens, index, side);
+            case KEYW_WHILE:
+                return getWhile(tokens, index, side);
+            case KEYW_RETURN:
+                return getReturn(tokens, index, side);
+            case KEYW_PRINT:
+                return getPrint(tokens, index, side);
+            case KEYW_SCAN:
+                return getScan(tokens, index, side);
             default:
                 printf("Чё бля...");
                 assert(0);
@@ -320,12 +385,12 @@ node *getStmts(token_stk_t *tokens, size_t *index, side side) {
         }
 
         stmt = KeywordNode(KEYW_STMT, side);
-        current = getStmt(tokens, index, RIGHT);
+        current = getStmt(tokens, index, LEFT);
 
         NodeConnect(stmt, current);
 
         if(glob_stmts) {
-            glob_stmts->side = LEFT;
+            glob_stmts->side = RIGHT;
 
             NodeConnect(stmt, glob_stmts);
         }

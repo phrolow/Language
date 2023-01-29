@@ -118,7 +118,7 @@ node *getParams(token_stk_t *tokens, size_t *index, side side) {
 
 node *getFuncDef(token_stk_t *tokens, size_t *index, side side) {
     assert(tokens && tokens->tokens && index);
-
+    printf("epta");
     token_t *token = TokensElem(tokens, *index);
 
     int is_main = 0;
@@ -128,22 +128,20 @@ node *getFuncDef(token_stk_t *tokens, size_t *index, side side) {
     if(token->value.keyword == KEYW_MAIN)
         is_main = 1;
 
-    (*index++);
-
-    token = TokensElem(tokens, *index);
+    (*index)++;
 
     node *def = KeywordNode(KEYW_DEFINE, side);
     node *func = KeywordNode(KEYW_FUNC, LEFT);
     node *name = NULL;
 
-    if(!is_main) {
+    if(is_main) {
         name = KeywordNode(KEYW_MAIN, LEFT);
     }
     else {
         name = getName(tokens, index, LEFT);
     }
 
-    if(!is_main) {
+    if(!is_main && (TokensElem(tokens, *index)->value.keyword == KEYW_OPRND)) {
         node *params = getParams(tokens, index, RIGHT);
 
         NodeConnect(func, params);
@@ -495,7 +493,7 @@ node *getStmts(token_stk_t *tokens, size_t *index, side side) {
         glob_stmts = stmt;
     }
 
-    return NULL;
+    return glob_stmts;
 }
 
 node *getGlobStmts(token_stk_t *tokens, size_t *index, side side) {
@@ -507,7 +505,7 @@ node *getGlobStmts(token_stk_t *tokens, size_t *index, side side) {
             *current = NULL,
             *stmt = NULL;
 
-    while (*index < tokens->size) {
+    while (*index < tokens->size - 1) {
         token = TokensElem(tokens, *index);
 
         if(token->type == KEYWORD_TYPE && token->value.keyword == EOF)
@@ -527,8 +525,10 @@ node *getGlobStmts(token_stk_t *tokens, size_t *index, side side) {
 
             current = assign;
         }
-        else if(token->type = KEYWORD_TYPE)
+
+        else if(token->type == KEYWORD_TYPE) {
             current = getFuncDef(tokens, index, LEFT);
+        }
         else KILL;
 
         if(current)

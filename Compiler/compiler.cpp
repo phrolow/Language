@@ -7,6 +7,7 @@ struct Compiler *newCompiler(FILE *out) {
     compiler->out = out;
     compiler->__IF_COUNTER__ = 0;
     compiler->__WHILE_COUNTER__ = 0;
+    compiler->GlobalNT = NULL;
 
     return compiler;
 }
@@ -16,6 +17,8 @@ void CompilerDtor(struct Compiler *compiler) {
     compiler->out = NULL;
     compiler->__IF_COUNTER__ = 0xFFFFFFFF;
     compiler->__WHILE_COUNTER__ = 0xFFFFFFFF;
+    ListDtor(compiler->GlobalNT);
+    compiler->GlobalNT = NULL;
 
     free(compiler);
 }

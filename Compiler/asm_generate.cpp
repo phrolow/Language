@@ -307,7 +307,7 @@ void InitCallParams(struct Node *node, struct List *NT, struct List *GlobalNT, s
 
     (*num_of_params)++;
 
-    GenerateExpr(node->children[RIGHT], NT, GlobalNT);
+    GenerateExpr(node->children[LEFT], NT, GlobalNT);
 
     fprintf(out, "POP [rbx+%d]\n", *num_of_params);
 }
@@ -325,7 +325,7 @@ void GenerateCall(struct Node *node, struct List *NT, struct List *GlobalNT) {
 
     struct Node *name = node->children[LEFT];
 
-    fprintf(out, "\nCALL %s:\n", name->val->value.name);
+    fprintf(out, "\nCALL :%s\n", name->val->value.name);
 
     fprintf(out, "PUSH rcx\n");
 }
@@ -367,7 +367,7 @@ void GenerateCond(struct Node *node, struct List *NT, struct List *GlobalNT, con
     GenerateJump(node, NT, GlobalNT, mark, num);
 }
 
-// TODO: place this counter into struct Backend
+// TODO: strucr
 static size_t __IF_COUNTER__    = 0;
 static size_t __WHILE_COUNTER__ = 0;
 
@@ -526,8 +526,8 @@ void GenerateMain(struct Node *node, struct List *NT, struct List *GlobalNT) {
     struct Node *func = node->children[LEFT];
     struct Node *main = func->children[LEFT];
 
-    IncreaseRBX(GlobalNT->size);
     GenerateMark(main);
+    IncreaseRBX(GlobalNT->size);
 
     assert(node);
 

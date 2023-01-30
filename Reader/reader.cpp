@@ -118,7 +118,7 @@ node *getParams(token_stk_t *tokens, size_t *index, side side) {
 
 node *getFuncDef(token_stk_t *tokens, size_t *index, side side) {
     assert(tokens && tokens->tokens && index);
-    printf("epta");
+
     token_t *token = TokensElem(tokens, *index);
 
     int is_main = 0;

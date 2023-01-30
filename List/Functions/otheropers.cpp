@@ -27,10 +27,10 @@ int ListIndexFirst(list *list, const char *str) {
 
     do {
         next = list->next[next];
-    } while(!strcmp(list->data[next].name, str) && next);
+    } while(strcmp(list->data[next].name, str) && next);
 
     if(next == 0)
-        next = -1;
+        return -1;
 
     return next;
 }
@@ -40,7 +40,7 @@ int ListIndexFirst(list *list, elem_t a) {
 
     do {
         next = list->next[next];
-    } while(!strcmp(list->data[next].name, a.name) && next);
+    } while(strcmp(list->data[next].name, a.name) && next);
 
     if(next == 0)
         next = -1;

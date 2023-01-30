@@ -46,7 +46,8 @@ int SearchInNametable(struct Node *node, struct List *NT) {
     assert(node && NT);
 
     size_t index = ListIndexFirst(NT, node->val->value.name);
-    if (index != 0) {
+
+    if (index != -1) {
         return 1;
     }
 
@@ -221,7 +222,7 @@ void InitVar(struct Node *node, struct List *NT, struct List *GlobalNT) {
 
     GenerateExpr(node->children[RIGHT], NT, GlobalNT);
 
-    fprintf(out, "POP [bx+%lu]\n", index - 1);
+    fprintf(out, "POP [rbx+%lu]\n", index - 1);
 }
 
 void GenerateVar(struct Node *node, struct List *NT, struct List *GlobalNT) {
@@ -404,9 +405,12 @@ void GenerateReturn(struct Node *node, struct List *NT, struct List *GlobalNT)
         ABORT("THERE IS NO RETURN");
     }
 
-    GenerateExpr(node->children[RIGHT], NT, GlobalNT);
+    if(node->children[RIGHT]) {
+        GenerateExpr(node->children[RIGHT], NT, GlobalNT);
 
-    fprintf(out, "POP rcx\n");
+        fprintf(out, "POP rcx\n");
+    }
+
     fprintf(out, "RET\n");
 }
 
@@ -427,7 +431,7 @@ void GenerateWhile(struct Node *node, struct List *NT, struct List *GlobalNT)
 }
 
 void GenerateDefParams(struct Node *node, struct List *NT, struct List *GlobalNT, size_t *free_memory_index) {
-    assert(free_memory_index && NT->size == 0);
+    assert(free_memory_index);
 
     if (node->children[LEFT]) {
         return;
@@ -440,17 +444,17 @@ void GenerateDefParams(struct Node *node, struct List *NT, struct List *GlobalNT
 }
 
 void IncreaseRBX(const size_t number) {
-    fprintf(out, "PUSH bx\n");
+    fprintf(out, "PUSH rbx\n");
     fprintf(out, "PUSH %lu\n", number);
     fprintf(out, "ADD\n");
-    fprintf(out, "POP bx\n");
+    fprintf(out, "POP rbx\n");
 }
 
 void DecreaseRBX(const size_t number) {
-    fprintf(out, "PUSH bx\n");
+    fprintf(out, "PUSH rbx\n");
     fprintf(out, "PUSH %lu\n", number);
     fprintf(out, "SUB\n");
-    fprintf(out, "POP bx\n");
+    fprintf(out, "POP rbx\n");
 }
 
 void GenerateMark(struct Node *mark) {
@@ -464,7 +468,7 @@ void GenerateMark(struct Node *mark) {
         else
         if (KEYW(mark) == KEYW_MAIN)
         {
-            fprintf(out, "\nmain:\n");
+            fprintf(out, "\n:main\n");
             return;
         }
     }
@@ -512,10 +516,6 @@ void GenerateFuncDef(struct Node *node, struct List *NT, struct List *GlobalNT)
 }
 
 void GenerateMain(struct Node *node, struct List *NT, struct List *GlobalNT) {
-    if (NT->size != 0) {
-        ABORT("NT ISNT EMPTY\n")
-    }
-
     if (!node_main) ABORT("NO_MAIN")
 
     struct Node *func = node->children[LEFT];
@@ -590,8 +590,8 @@ void InitGlobVar(struct Node *node, struct List *GlobalNT) {
 void GenerateGS(struct Node *node, struct List *GlobalNT) {
     if (!NODE_KEYW(node, KEYW_STMT)) ABORT("NOT GLOBAL STATEMENT\n");
 
-    fprintf(out, "CALL main:\n");
-    fprintf(out, "HLT\n");
+    fprintf(out, "CALL :main\n");
+    fprintf(out, "HLT\n\n");
 
     while (node->children[RIGHT])
         node = node->children[RIGHT];
@@ -613,7 +613,7 @@ void GenerateGS(struct Node *node, struct List *GlobalNT) {
 
     while (node) {
         if (NODE_KEYW(node->children[LEFT], KEYW_DEFINE)) {
-            GenerateFuncDef(node->children[RIGHT], NT, GlobalNT);
+            GenerateFuncDef(node->children[LEFT], NT, GlobalNT);
         } else if (NODE_KEYW(node->children[LEFT], KEYW_ASSIGN)) {
             node = node->parent;
             continue;

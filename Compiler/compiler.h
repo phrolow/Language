@@ -9,14 +9,6 @@
 #include "../Debug/debug.h"
 #include "../List/list.h"
 
-const size_t MAX_VARS = 50;
-const size_t MAX_ASM_LINE = 0x40;
-
-struct Compiler {
-    char var_table[NAME_MAX_LEN][MAX_VARS];
-    Tree *code;
-};
-
 int language_compile(const char *in, const char *out);
 
 int IsNum(struct Node *node);
@@ -41,7 +33,7 @@ void GenerateGlobVar   (struct Node *node, struct List *GlobalNT);
 
 void GenerateMathOper  (struct Node *node);
 void GenerateNum       (struct Node *node);
-void InitCallParams(struct Node *node, struct List *NT, struct List *GlobalNT, size_t *num_of_params);
+void InitCallParams    (struct Node *node, struct List *NT, struct List *GlobalNT, size_t *num_of_params);
 void GenerateCall      (struct Node *node, struct List *NT, struct List *GlobalNT);
 void GenerateJump      (struct Node *node, struct List *NT, struct List *GlobalNT, const char *mark, const int num);
 void GenerateCond      (struct Node *node, struct List *NT, struct List *GlobalNT, const char *mark, const int num);

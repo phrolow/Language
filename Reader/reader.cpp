@@ -125,8 +125,9 @@ node *getFuncDef(token_stk_t *tokens, size_t *index, side side) {
 
     if(token->value.keyword != KEYW_MAIN && token->value.keyword != KEYW_FUNC) KILL;
 
-    if(token->value.keyword == KEYW_MAIN)
+    if(token->value.keyword == KEYW_MAIN) {
         is_main = 1;
+    }
 
     (*index)++;
 

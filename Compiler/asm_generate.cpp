@@ -59,6 +59,15 @@ static struct Node *node_main = nullptr;
 
 void GenerateScan(struct Node *node, struct List *NT, struct List *GlobalNT) {
     assert(node && NT && GlobalNT);
+
+    if (!node->children[LEFT]) ABORT("ERROR: no arg\n");
+
+    PushInNametable(node->children[LEFT], NT);
+
+    size_t index = IndexNametable(node->children[LEFT], NT);
+
+    fprintf(out, "IN\n");
+    fprintf(out, "POP [rbx+%lu]\n", index - 1);
 }
 
 void GeneratePrint(struct Node *node, struct List *NT, struct List *GlobalNT) {
@@ -433,41 +442,38 @@ void GenerateWhile(struct Node *node, struct List *NT, struct List *GlobalNT)
 void GenerateDefParams(struct Node *node, struct List *NT, struct List *GlobalNT, size_t *free_memory_index) {
     assert(free_memory_index);
 
-    if (node->children[LEFT]) {
+    if (node->children[RIGHT]) {
         return;
     }
     else {
         *free_memory_index = 1;
-        if (SearchInNametable(node->children[RIGHT], GlobalNT)) ABORT("VAR IS ALREASY DEFINED");
-        PushInNametable(node->children[RIGHT], NT);
+        if (SearchInNametable(node->children[LEFT], GlobalNT)) ABORT("VAR IS ALREASY DEFINED");
+        PushInNametable(node->children[LEFT], NT);
     }
 }
 
 void IncreaseRBX(const size_t number) {
-    fprintf(out, "PUSH rbx\n");
+    fprintf(out, "PUSH rbx ; incrrbx\n");
     fprintf(out, "PUSH %lu\n", number);
     fprintf(out, "ADD\n");
     fprintf(out, "POP rbx\n");
 }
 
 void DecreaseRBX(const size_t number) {
-    fprintf(out, "PUSH rbx\n");
+    fprintf(out, "PUSH rbx ; decrrbx\n");
     fprintf(out, "PUSH %lu\n", number);
     fprintf(out, "SUB\n");
     fprintf(out, "POP rbx\n");
 }
 
 void GenerateMark(struct Node *mark) {
-    if (mark->val->type == VAR_TYPE || NODE_KEYW(mark, KEYW_MAIN))
-    {
-        if (mark->val->type == VAR_TYPE)
-        {
-            fprintf(out, "\n%s:\n", mark->val->value.name);
+    if (mark->val->type == VAR_TYPE || NODE_KEYW(mark, KEYW_MAIN)) {
+        if (mark->val->type == VAR_TYPE) {
+            fprintf(out, "\n:%s\n", mark->val->value.name);
             return;
         }
         else
-        if (KEYW(mark) == KEYW_MAIN)
-        {
+        if (KEYW(mark) == KEYW_MAIN) {
             fprintf(out, "\n:main\n");
             return;
         }
@@ -498,7 +504,6 @@ void GenerateFuncDef(struct Node *node, struct List *NT, struct List *GlobalNT)
     struct Node *params = func->children[RIGHT];
     size_t free_memory_index = 0;
     GenerateMark(mark);
-    
 
     if (params) {
         GenerateDefParams(params, NT, GlobalNT, &free_memory_index);

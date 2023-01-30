@@ -16,7 +16,7 @@ int language_compile(const char *in, const char *out) {
 
     TreeDump(expression);
 
-    GenerateASM(ASM_PATH, expression);
+    GenerateASM(ASM_PATH, expression, compiler);
 
     TreeDtor(expression);
     //free(txt.content);

@@ -8,7 +8,9 @@ int language_compile(const char *in, const char *out) {
 
     text txt = textFromFile(in);
 
-    //Compiler *compiler = NewCompiler(expression);
+    FILE *fp = fopen(out, "w");
+
+    Compiler *compiler = newCompiler(fp);
 
     expression = ReadExpression(txt.content);
 
@@ -18,6 +20,8 @@ int language_compile(const char *in, const char *out) {
 
     TreeDtor(expression);
     //free(txt.content);
+
+    fclose(fp);
 
     return 0;
 }

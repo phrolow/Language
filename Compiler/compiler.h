@@ -9,7 +9,17 @@
 #include "../Debug/debug.h"
 #include "../List/list.h"
 
+struct Compiler {
+    FILE *out;
+    struct Node *node_main;
+    size_t __IF_COUNTER__ ;
+    size_t __WHILE_COUNTER__;
+};
+
 int language_compile(const char *in, const char *out);
+
+struct Compiler *newCompiler(FILE *out);
+void CompilerDtor(struct Compiler *compiler);
 
 int IsNum(struct Node *node);
 int IsVar(struct Node *node);

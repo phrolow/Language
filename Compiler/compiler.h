@@ -15,6 +15,7 @@ struct Compiler {
     size_t __IF_COUNTER__ ;
     size_t __WHILE_COUNTER__;
     struct List *GlobalNT;
+    size_t free_memory_index;
 };
 
 int language_compile(const char *in, const char *out);
@@ -33,7 +34,7 @@ void DecreaseRBX(const size_t number, struct Compiler *compiler);
 void GenerateMark(struct Node *mark, struct Compiler *compiler);
 void GenerateMain      (struct Node *node, struct List *NT, struct Compiler *compiler);
 void GenerateFuncDef   (struct Node *node, struct List *NT, struct Compiler *compiler);
-void GenerateDefParams (struct Node *node, struct List *NT, struct Compiler *compiler, size_t *free_memory_index);
+void GenerateDefParams (struct Node *node, struct List *NT, struct Compiler *compiler);
 
 void InitVar           (struct Node *node, struct List *NT, struct Compiler *compiler);
 void GenerateVar       (struct Node *node, struct List *NT, struct Compiler *compiler);

@@ -320,7 +320,7 @@ void GenerateCall(struct Node *node, struct List *NT, struct Compiler *compiler)
 
     struct Node *name = node->children[LEFT];
 
-    fprintf(compiler->out, "\nCALL :%s\n", name->val->value.name);
+    fprintf(compiler->out, "CALL :%s\n", name->val->value.name);
 
     fprintf(compiler->out, "PUSH rcx\n");
 }
@@ -411,6 +411,8 @@ void GenerateReturn(struct Node *node, struct List *NT, struct Compiler *compile
         fprintf(compiler->out, "POP rcx\n");
     }
 
+    DecreaseRBX(compiler->free_memory_index, compiler);
+
     fprintf(compiler->out, "RET\n");
 }
 
@@ -430,14 +432,12 @@ void GenerateWhile(struct Node *node, struct List *NT, struct Compiler *compiler
     fprintf(compiler->out, "END_WHILE_%d:\n", counter);
 }
 
-void GenerateDefParams(struct Node *node, struct List *NT, struct Compiler *compiler, size_t *free_memory_index) {
-    assert(free_memory_index);
-
+void GenerateDefParams(struct Node *node, struct List *NT, struct Compiler *compiler) {
     if (node->children[RIGHT]) {
         return;
     }
     else {
-        *free_memory_index = 1;
+        compiler->free_memory_index = 1;
         if (SearchInNametable(node->children[LEFT], compiler->GlobalNT)) ABORT("VAR IS ALREASY DEFINED");
         PushInNametable(node->children[LEFT], NT);
     }
@@ -460,12 +460,12 @@ void DecreaseRBX(const size_t number, struct Compiler *compiler) {
 void GenerateMark(struct Node *mark, struct Compiler *compiler) {
     if (mark->val->type == VAR_TYPE || NODE_KEYW(mark, KEYW_MAIN)) {
         if (mark->val->type == VAR_TYPE) {
-            fprintf(compiler->out, "\n:%s\n", mark->val->value.name);
+            fprintf(compiler->out, ":%s\n", mark->val->value.name);
             return;
         }
         else
         if (KEYW(mark) == KEYW_MAIN) {
-            fprintf(compiler->out, "\n:main\n");
+            fprintf(compiler->out, ":main\n");
             return;
         }
     }
@@ -493,20 +493,18 @@ void GenerateFuncDef(struct Node *node, struct List *NT, struct Compiler *compil
     }
 
     struct Node *params = func->children[RIGHT];
-    size_t free_memory_index = 0;
+    compiler->free_memory_index = 0;
     GenerateMark(mark, compiler);
 
     if (params) {
-        GenerateDefParams(params, NT, compiler, &free_memory_index);
+        GenerateDefParams(params, NT, compiler);
     }
 
-    IncreaseRBX(free_memory_index, compiler);
+    IncreaseRBX(compiler->free_memory_index, compiler);
 
     struct Node *stmts  = node->children[RIGHT];
 
     GenerateStmts(stmts, NT, compiler);
-
-    DecreaseRBX(free_memory_index, compiler);
 
     ListInit(NT);
 }
@@ -518,7 +516,7 @@ void GenerateMain(struct Node *node, struct List *NT, struct Compiler *compiler)
     struct Node *main = func->children[LEFT];
 
     GenerateMark(main, compiler);
-    IncreaseRBX(compiler->GlobalNT->size, compiler);
+    IncreaseRBX(gettail(compiler->GlobalNT) + 1, compiler);
 
     assert(node);
 
@@ -587,7 +585,7 @@ void GenerateGS(struct Node *node, struct Compiler *compiler) {
     if (!NODE_KEYW(node, KEYW_STMT)) ABORT("NOT GLOBAL STATEMENT\n");
 
     fprintf(compiler->out, "CALL :main\n");
-    fprintf(compiler->out, "HLT\n\n");
+    fprintf(compiler->out, "HLT\n");
 
     while (node->children[RIGHT])
         node = node->children[RIGHT];

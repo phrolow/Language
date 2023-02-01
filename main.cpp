@@ -7,11 +7,7 @@ int main(int argc, char **argv) {
         exit(1);
     }
 
-    if(!checkfile(argv[1])) {
-        printf("Invalid input file");
-        exit(2);
-    }
-
+    //system("Y:/gthb/Language/Compiler.exe code.txt");
     language_compile(argv[1], ASM_PATH);
     system("Y:/gthb/Language/Exes/asm.exe ../asm.asm ../bin.bin");
     system("Y:/gthb/Language/Exes/cpu.exe ../bin.bin");

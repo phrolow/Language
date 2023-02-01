@@ -2,7 +2,13 @@
 #include "../config.h"
 
 int language_compile(const char *in, const char *out) {
-    assert(in && out);
+//    if(argc < 1) {
+//        printf("Too few arguments!");
+//        exit(1);
+//    }
+//
+//    const char *in = argv[1];
+//    const char *out = ASM_PATH;
 
     tree *expression;
 

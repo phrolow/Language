@@ -70,12 +70,12 @@ void GenerateScan(struct Node *node, struct List *NT, struct Compiler *compiler)
 void GeneratePrint(struct Node *node, struct List *NT, struct Compiler *compiler) {
     assert(node && NT && compiler);
 
-    if (!node->children[RIGHT]) ABORT("ERROR: no arg\n");
+    if (!node->children[LEFT]) ABORT("ERROR: no arg\n");
 
-    GenerateExpr(node->children[RIGHT], NT, compiler);
+    GenerateExpr(node->children[LEFT], NT, compiler);
 
     fprintf(compiler->out, "OUT\n");
-    fprintf(compiler->out, "POP rdx\n");
+    //fprintf(compiler->out, "POP rdx\n");
 }
 
 void GenerateAssign(struct Node *node, struct List *NT, struct Compiler *compiler) {
@@ -405,8 +405,8 @@ void GenerateReturn(struct Node *node, struct List *NT, struct Compiler *compile
         ABORT("THERE IS NO RETURN");
     }
 
-    if(node->children[RIGHT]) {
-        GenerateExpr(node->children[RIGHT], NT, compiler);
+    if(node->children[LEFT]) {
+        GenerateExpr(node->children[LEFT], NT, compiler);
 
         fprintf(compiler->out, "POP rcx\n");
     }
@@ -444,14 +444,14 @@ void GenerateDefParams(struct Node *node, struct List *NT, struct Compiler *comp
 }
 
 void IncreaseRBX(const size_t number, struct Compiler *compiler) {
-    fprintf(compiler->out, "PUSH rbx ; incrrbx\n");
+    fprintf(compiler->out, "PUSH rbx\n");
     fprintf(compiler->out, "PUSH %lu\n", number);
     fprintf(compiler->out, "ADD\n");
     fprintf(compiler->out, "POP rbx\n");
 }
 
 void DecreaseRBX(const size_t number, struct Compiler *compiler) {
-    fprintf(compiler->out, "PUSH rbx ; decrrbx\n");
+    fprintf(compiler->out, "PUSH rbx\n");
     fprintf(compiler->out, "PUSH %lu\n", number);
     fprintf(compiler->out, "SUB\n");
     fprintf(compiler->out, "POP rbx\n");

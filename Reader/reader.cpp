@@ -28,7 +28,7 @@
 node *KeywordNode(KEYW keyw, SIDE side) {
     node *keywordnode = (node *) malloc(sizeof(node));
 
-    token_t *token = NewToken(KEYWORD_TYPE, {.keyword = keyw}); //TODO:
+    token_t *token = NewToken(KEYWORD_TYPE, {.keyword = keyw});
 
     NodeCtor(keywordnode, NULL, token, side);
 
@@ -162,7 +162,11 @@ node *getToken(token_stk_t *tokens, size_t *index, side side) {
 
     token_t *token = TokensElem(tokens, *index);
 
-    NEWNODE(newnode, token, side);
+    token_t *copy = (token_t*) malloc(sizeof(token_t));
+
+    memcpy(copy, token, sizeof(token_t));
+
+    NEWNODE(newnode, copy, side);
 
     (*index)++;
 
@@ -295,13 +299,12 @@ node* getE(token_stk_t *tokens, size_t *index, side side) {
 node *getIf(token_stk_t *tokens, size_t *index, side side) {
     assert(tokens && tokens->tokens && index);
 
-    NEWNODE(if_node, require(tokens, index, KEYW_IF), side);
-
+    node *if_node = getToken(tokens, index, side);
     node *condition = getCondition(tokens, index, LEFT);
+
     NodeConnect(if_node, condition);
 
     node *stmts = getStmts(tokens, index, RIGHT);
-
     token_t *token = TokensElem(tokens, *index);
 
     if(token->type == KEYWORD_TYPE && token->value.keyword != KEYW_ELSE) {
@@ -572,6 +575,8 @@ tree* ReadExpression(char *txt) {
     GetTokens(txt, tokens);
 
     TreeCtor(expression, getG(tokens));
+
+    TokensDtor(tokens);
 
     return expression;
 }

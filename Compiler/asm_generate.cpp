@@ -353,7 +353,7 @@ void GenerateJump(struct Node *node, struct List *NT, struct Compiler *compiler,
         default: ABORT("UNDEF OP\n");
     }
 
-    fprintf(compiler->out, " %s_%d:\n", mark, num);
+    fprintf(compiler->out, " :%s_%d\n", mark, num);
 }
 
 void GenerateCond(struct Node *node, struct List *NT, struct Compiler *compiler, const char *mark, const int num) {
@@ -423,13 +423,13 @@ void GenerateWhile(struct Node *node, struct List *NT, struct Compiler *compiler
 
     int counter = compiler->__WHILE_COUNTER__++;
 
-    fprintf(compiler->out, "\nWHILE_%d:\n", counter);
+    fprintf(compiler->out, ":WHILE_%d\n", counter);
 
     GenerateCond(condition, NT, compiler, "END_WHILE", counter);
     GenerateStmts(while_stmts, NT, compiler);
 
-    fprintf(compiler->out, "JMP WHILE_%d:\n", counter);
-    fprintf(compiler->out, "END_WHILE_%d:\n", counter);
+    fprintf(compiler->out, ":JMP WHILE_%d\n", counter);
+    fprintf(compiler->out, ":END_WHILE_%d\n", counter);
 }
 
 void GenerateDefParams(struct Node *node, struct List *NT, struct Compiler *compiler) {

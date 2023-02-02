@@ -14,6 +14,9 @@ int language_compile(const char *in, const char *out) {
 
     text txt = textFromFile(in);
 
+    printf(in);
+    printf("\n%llu\n", txt.nChar);
+
     FILE *fp = fopen(out, "w");
 
     Compiler *compiler = newCompiler(fp);

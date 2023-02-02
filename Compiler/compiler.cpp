@@ -19,7 +19,7 @@ void CompilerDtor(struct Compiler *compiler) {
     compiler->__WHILE_COUNTER__ = 0xFFFFFFFF;
     ListDtor(compiler->GlobalNT);
     compiler->GlobalNT = NULL;
-    compiler->free_memory_index;
+    compiler->free_memory_index = 0xFFFFFFFF;
 
     free(compiler);
 }

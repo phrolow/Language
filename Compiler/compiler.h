@@ -43,8 +43,8 @@ void InitGlobVar       (struct Node *node, struct Compiler *compiler);
 void GenerateGlobExpr  (struct Node *node, struct Compiler *compiler);
 void GenerateGlobVar   (struct Node *node, struct Compiler *compiler);
 
-void GenerateMathOper(struct Node *node, struct Compiler *compiler);
-void GenerateNum(struct Node *node, struct Compiler *compiler);
+void GenerateMathOper  (struct Node *node, struct Compiler *compiler);
+void GenerateNum       (struct Node *node, struct Compiler *compiler);
 void InitCallParams    (struct Node *node, struct List *NT, struct Compiler *compiler, size_t *num_of_params);
 void GenerateCall      (struct Node *node, struct List *NT, struct Compiler *compiler);
 void GenerateJump      (struct Node *node, struct List *NT, struct Compiler *compiler, const char *mark, const int num);
@@ -54,6 +54,7 @@ void GenerateReturn    (struct Node *node, struct List *NT, struct Compiler *com
 void GenerateWhile     (struct Node *node, struct List *NT, struct Compiler *compiler);
 void GenerateScan      (struct Node *node, struct List *NT, struct Compiler *compiler);
 void GeneratePrint     (struct Node *node, struct List *NT, struct Compiler *compiler);
+void GenerateSqrt      (struct Node *node, struct List *NT, struct Compiler *compiler);
 void GenerateAssign    (struct Node *node, struct List *NT, struct Compiler *compiler);
 
 void GenerateStmt      (struct Node *node, struct List *NT, struct Compiler *compiler);

@@ -78,6 +78,20 @@ void GeneratePrint(struct Node *node, struct List *NT, struct Compiler *compiler
     //fprintf(compiler->out, "POP rdx\n");
 }
 
+void GenerateSqrt(struct Node *node, struct List *NT, struct Compiler *compiler) {
+    assert(node && NT && compiler);
+
+    if (!node->children[LEFT]) ABORT("ERROR: no arg\n");
+
+    GenerateExpr(node->children[LEFT], NT, compiler);
+
+    fprintf(compiler->out, "PUSH 10000\n");
+    fprintf(compiler->out, "POP rax\n");
+    fprintf(compiler->out, "ASQRT\n");
+    fprintf(compiler->out, "PUSH 10000\n");
+    fprintf(compiler->out, "DIV\n");
+}
+
 void GenerateAssign(struct Node *node, struct List *NT, struct Compiler *compiler) {
     assert(node && compiler);
 
@@ -114,6 +128,9 @@ void GenerateStmt  (struct Node *node, struct List *NT, struct Compiler *compile
             break;
         case KEYW_PRINT:
             GeneratePrint (node, NT, compiler);
+            break;
+        case KEYW_SQRT:
+            GenerateSqrt(node, NT, compiler);
             break;
         case KEYW_ADD:
         case KEYW_SUB:
@@ -287,6 +304,12 @@ void GenerateExpr  (struct Node *node, struct List *NT, struct Compiler *compile
         return;
     }
 
+    if(NODE_KEYW(node, KEYW_SQRT)) {
+        GenerateSqrt(node, NT, compiler);
+
+        return;
+    }
+
     ABORT("ERROR: undefined operator\n");
 }
 
@@ -333,10 +356,10 @@ void GenerateJump(struct Node *node, struct List *NT, struct Compiler *compiler,
     switch (KEYW(node))
     {
         case KEYW_LESS:
-            fprintf(compiler->out, "JAE");
+            fprintf(compiler->out, "JBE");
             break;
         case KEYW_LESSOREQ:
-            fprintf(compiler->out, "JA" );
+            fprintf(compiler->out, "JB" );
             break;
         case KEYW_NOTEQUAL:
             fprintf(compiler->out, "JE" );
@@ -345,10 +368,10 @@ void GenerateJump(struct Node *node, struct List *NT, struct Compiler *compiler,
             fprintf(compiler->out, "JNE");
             break;
         case KEYW_GREATOREQ:
-            fprintf(compiler->out, "JB" );
+            fprintf(compiler->out, "JA" );
             break;
         case KEYW_GREAT:
-            fprintf(compiler->out, "JBE");
+            fprintf(compiler->out, "JAE");
             break;
         default: ABORT("UNDEF OP\n");
     }

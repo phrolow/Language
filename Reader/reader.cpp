@@ -221,6 +221,20 @@ node *getF(token_stk_t *tokens, size_t *index, side side) {
         return call;
     }
 
+    if(token->type == KEYWORD_TYPE && token->value.keyword == KEYW_SQRT) {
+        node *sqrt = getToken(tokens, index, side);
+
+        require(tokens, index, KEYW_OPRND);
+
+        node *arg = getE(tokens, index, LEFT);
+
+        require(tokens, index, KEYW_CLRND);
+
+        NodeConnect(sqrt, arg);
+
+        return sqrt;
+    }
+
     return getN(tokens, index, side);
 }
 
@@ -307,7 +321,7 @@ node *getIf(token_stk_t *tokens, size_t *index, side side) {
     node *stmts = getStmts(tokens, index, RIGHT);
     token_t *token = TokensElem(tokens, *index);
 
-    if(token->type == KEYWORD_TYPE && token->value.keyword != KEYW_ELSE) {
+    if(!(token->type == KEYWORD_TYPE && token->value.keyword == KEYW_ELSE)) {
         NodeConnect(if_node, stmts);
 
         return if_node;
@@ -354,6 +368,20 @@ node *getReturn(token_stk_t *tokens, size_t *index, side side) {
     require(tokens, index, KEYW_DOTPOT);
 
     return return_node;
+}
+
+node *getSqrt(token_stk_t *tokens, size_t *index, side side) {
+    assert(tokens && tokens->tokens && index);
+
+    node *sqrt_node = getToken(tokens, index, side);
+
+    node *expression = getE(tokens, index, LEFT);
+
+    NodeConnect(sqrt_node, expression);
+
+    require(tokens, index, KEYW_DOTPOT);
+
+    return sqrt_node;
 }
 
 node *getPrint(token_stk_t *tokens, size_t *index, side side) {
@@ -430,6 +458,8 @@ node *getStmt(token_stk_t *tokens, size_t *index, side side) {
                 return getPrint(tokens, index, side);
             case KEYW_SCAN:
                 return getScan(tokens, index, side);
+            case KEYW_SQRT:
+                return getSqrt(tokens, index, side);
             default:
                 printf("Чё бля...");
                 assert(0);

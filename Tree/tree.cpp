@@ -17,7 +17,7 @@ void NodeDtor(node *nod) {
     nod->parent = NULL;
     nod->children[0] = NULL;
     nod->children[1] = NULL;
-    free(nod->val); //это полный пиздец что оно падает
+    //free(nod->val); //это полный пиздец что оно падает
     nod->val = NULL;
 
     free(nod);

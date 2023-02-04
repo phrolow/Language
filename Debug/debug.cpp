@@ -20,20 +20,20 @@ static void PrintNode(const node *node, const size_t *nNode, const char color[CO
 
     switch (node->val->type) {
         case NUM_TYPE:
-            fprintf(fp, "label=\"NUM %lg\"", node->val->value);
+            fprintf(fp, "label=\"%lg\"", node->val->value);
             break;
         case VAR_TYPE:
-            fprintf(fp, "label=\"NAME %s\"", node->val->value.name);
+            fprintf(fp, "label=\"%s\"", node->val->value.name);
             break;
         case KEYWORD_TYPE:
             #define DEF_KEYW(name, num, sign)                                       \
                     case KEYW_##name:                                               \
-                        fprintf(fp, "label=\"KEYW %s\"", #name);     \
+                        fprintf(fp, "label=\"%s\"", #name);     \
                         break;
 
             #define DEF_OPER(name, num, sign)                                       \
                     case KEYW_##name:                                               \
-                        fprintf(fp, "label=\"KEYW %s\"", #name);     \
+                        fprintf(fp, "label=\"%s\"", #name);     \
                         break;
 
             #define DEF_HELP(name, num, sign)
@@ -47,7 +47,7 @@ static void PrintNode(const node *node, const size_t *nNode, const char color[CO
                 #undef DEF_OPER
                 #undef DEF_HELP
                 default:
-                    fprintf(fp, "label=\"KEYW ERROR\"");
+                    fprintf(fp, "label=\"UNDEF KEYW\"");
                     break;
             }
             break;

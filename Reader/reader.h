@@ -45,6 +45,8 @@ node *getPrint(token_stk_t *tokens, size_t *index, side side);
 
 node *getScan(token_stk_t *tokens, size_t *index, side side);
 
+node *getSqrt(token_stk_t *tokens, size_t *index, side side);
+
 node *getStmt(token_stk_t *tokens, size_t *index, side side);
 
 node *getStmts(token_stk_t *tokens, size_t *index, side side);

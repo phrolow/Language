@@ -1,7 +1,7 @@
 #include "reader.h"
 
 #define KILL {                                                      \
-    printf("WRONG TOKEN #%llu\n", *index);                       \
+    printf("WRONG TOKEN #%lu\n", *index);                       \
                                                                     \
     assert(0);                                                      \
 }
@@ -25,7 +25,7 @@
                 printf("%c\n", sign);      \
                 break;
 
-node *KeywordNode(KEYW keyw, SIDE side) {
+node *KeywordNode(KEYW keyw, side_t side) {
     node *keywordnode = (node *) malloc(sizeof(node));
 
     token_t *token = NewToken(KEYWORD_TYPE, {.keyword = keyw});
@@ -41,7 +41,7 @@ token_t *require(token_stk_t *tokens, size_t *index, KEYW keyw) {
     token_t *token = TokensElem(tokens, *index);
 
     if(token->type != KEYWORD_TYPE || token->value.keyword != keyw) {
-        printf("INVALID SYNTAX: at %llu required ", *index);
+        printf("INVALID SYNTAX: at %lu required ", *index);
 
         switch (keyw) {
             #include "../keywords.h"
@@ -63,7 +63,7 @@ token_t *require(token_stk_t *tokens, size_t *index, KEYW keyw) {
     return token;
 }
 
-node *getLogOp(token_stk_t *tokens, size_t *index, side side) {
+node *getLogOp(token_stk_t *tokens, size_t *index, side_t side) {
     assert(tokens && tokens->tokens && index);
 
     token_t *token = TokensElem(tokens, *index);
@@ -74,7 +74,7 @@ node *getLogOp(token_stk_t *tokens, size_t *index, side side) {
     return getToken(tokens, index, side);
 }
 
-node *getCondition(token_stk_t *tokens, size_t *index, side side) {
+node *getCondition(token_stk_t *tokens, size_t *index, side_t side) {
     assert(tokens && tokens->tokens && index);
 
     require(tokens, index, KEYW_OPRND);
@@ -91,7 +91,7 @@ node *getCondition(token_stk_t *tokens, size_t *index, side side) {
     return log_op; //неправильно как-то....
 }
 
-node *getName(token_stk_t *tokens, size_t *index, side side) {
+node *getName(token_stk_t *tokens, size_t *index, side_t side) {
     assert(tokens && tokens->tokens && index);
 
     token_t *token = TokensElem(tokens, *index);
@@ -101,7 +101,7 @@ node *getName(token_stk_t *tokens, size_t *index, side side) {
     return getToken(tokens, index, side);
 }
 
-node *getParams(token_stk_t *tokens, size_t *index, side side) {
+node *getParams(token_stk_t *tokens, size_t *index, side_t side) {
     assert(tokens && tokens->tokens && index);
 
     require(tokens, index, KEYW_OPRND);
@@ -116,7 +116,7 @@ node *getParams(token_stk_t *tokens, size_t *index, side side) {
     return param;
 }
 
-node *getFuncDef(token_stk_t *tokens, size_t *index, side side) {
+node *getFuncDef(token_stk_t *tokens, size_t *index, side_t side) {
     assert(tokens && tokens->tokens && index);
 
     token_t *token = TokensElem(tokens, *index);
@@ -157,7 +157,7 @@ node *getFuncDef(token_stk_t *tokens, size_t *index, side side) {
     return def;
 }
 
-node *getToken(token_stk_t *tokens, size_t *index, side side) {
+node *getToken(token_stk_t *tokens, size_t *index, side_t side) {
     assert(tokens && tokens->tokens && index);
 
     token_t *token = TokensElem(tokens, *index);
@@ -173,7 +173,7 @@ node *getToken(token_stk_t *tokens, size_t *index, side side) {
     return newnode;
 }
 
-node* getN(token_stk_t *tokens, size_t *index, side side) {
+node* getN(token_stk_t *tokens, size_t *index, side_t side) {
     assert(tokens && tokens->tokens && index);
 
     token_t *token = TokensElem(tokens, *index);
@@ -183,7 +183,7 @@ node* getN(token_stk_t *tokens, size_t *index, side side) {
     return getToken(tokens, index, side);
 }
 
-node* getV(token_stk_t *tokens, size_t *index, side side) {
+node* getV(token_stk_t *tokens, size_t *index, side_t side) {
     assert(tokens && tokens->tokens && index);
 
     token_t *token = TokensElem(tokens, *index);
@@ -194,7 +194,7 @@ node* getV(token_stk_t *tokens, size_t *index, side side) {
     return getN(tokens, index, side);
 }
 
-node *getF(token_stk_t *tokens, size_t *index, side side) {
+node *getF(token_stk_t *tokens, size_t *index, side_t side) {
     assert(tokens && tokens->tokens && index);
 
     token_t *token = TokensElem(tokens, *index);
@@ -238,7 +238,7 @@ node *getF(token_stk_t *tokens, size_t *index, side side) {
     return getN(tokens, index, side);
 }
 
-node* getPow(token_stk_t *tokens, size_t *index, side side) {
+node* getPow(token_stk_t *tokens, size_t *index, side_t side) {
     assert(tokens && tokens->tokens && index);
 
     node *left = getP(tokens, index, side);
@@ -262,7 +262,7 @@ node* getPow(token_stk_t *tokens, size_t *index, side side) {
     return left;
 }
 
-node* getT(token_stk_t *tokens, size_t *index, side side) {
+node* getT(token_stk_t *tokens, size_t *index, side_t side) {
     assert(tokens && tokens->tokens && index);
 
     node *left = getPow(tokens, index, side);
@@ -286,7 +286,7 @@ node* getT(token_stk_t *tokens, size_t *index, side side) {
     return left;
 }
 
-node* getE(token_stk_t *tokens, size_t *index, side side) {
+node* getE(token_stk_t *tokens, size_t *index, side_t side) {
     assert(tokens && tokens->tokens && index);
 
     node *left = getT(tokens, index, side);
@@ -310,7 +310,7 @@ node* getE(token_stk_t *tokens, size_t *index, side side) {
     return left;
 }
 
-node *getIf(token_stk_t *tokens, size_t *index, side side) {
+node *getIf(token_stk_t *tokens, size_t *index, side_t side) {
     assert(tokens && tokens->tokens && index);
 
     node *if_node = getToken(tokens, index, side);
@@ -341,7 +341,7 @@ node *getIf(token_stk_t *tokens, size_t *index, side side) {
     return if_node;
 }
 
-node *getWhile(token_stk_t *tokens, size_t *index, side side) {
+node *getWhile(token_stk_t *tokens, size_t *index, side_t side) {
     assert(tokens && tokens->tokens && index);
 
     node *while_node = getToken(tokens, index, side);
@@ -354,7 +354,7 @@ node *getWhile(token_stk_t *tokens, size_t *index, side side) {
     return while_node;
 }
 
-node *getReturn(token_stk_t *tokens, size_t *index, side side) {
+node *getReturn(token_stk_t *tokens, size_t *index, side_t side) {
     assert(tokens && tokens->tokens && index);
 
     node *return_node = getToken(tokens, index, side);
@@ -370,7 +370,7 @@ node *getReturn(token_stk_t *tokens, size_t *index, side side) {
     return return_node;
 }
 
-node *getSqrt(token_stk_t *tokens, size_t *index, side side) {
+node *getSqrt(token_stk_t *tokens, size_t *index, side_t side) {
     assert(tokens && tokens->tokens && index);
 
     node *sqrt_node = getToken(tokens, index, side);
@@ -384,7 +384,7 @@ node *getSqrt(token_stk_t *tokens, size_t *index, side side) {
     return sqrt_node;
 }
 
-node *getPrint(token_stk_t *tokens, size_t *index, side side) {
+node *getPrint(token_stk_t *tokens, size_t *index, side_t side) {
     assert(tokens && tokens->tokens && index);
 
     node *print_node = getToken(tokens, index, side);
@@ -398,7 +398,7 @@ node *getPrint(token_stk_t *tokens, size_t *index, side side) {
     return print_node;
 }
 
-node *getScan(token_stk_t *tokens, size_t *index, side side) {
+node *getScan(token_stk_t *tokens, size_t *index, side_t side) {
     assert(tokens && tokens->tokens && index);
 
     node *scan_node = getToken(tokens, index, side);
@@ -412,7 +412,7 @@ node *getScan(token_stk_t *tokens, size_t *index, side side) {
     return scan_node;
 }
 
-node *getStmt(token_stk_t *tokens, size_t *index, side side) {
+node *getStmt(token_stk_t *tokens, size_t *index, side_t side) {
     assert(tokens && tokens->tokens && index);
 
     token_t *token = TokensElem(tokens, *index);
@@ -473,7 +473,7 @@ node *getStmt(token_stk_t *tokens, size_t *index, side side) {
     return stmt_child;
 }
 
-node* getP(token_stk_t *tokens, size_t *index, side side) {
+node* getP(token_stk_t *tokens, size_t *index, side_t side) {
     assert(tokens && tokens->tokens && index);
 
     token_t *token = TokensElem(tokens, *index);
@@ -490,7 +490,7 @@ node* getP(token_stk_t *tokens, size_t *index, side side) {
     return nod;
 }
 
-node *getStmts(token_stk_t *tokens, size_t *index, side side) {
+node *getStmts(token_stk_t *tokens, size_t *index, side_t side) {
     assert(tokens && tokens->tokens && index);
 
     token_t *token = TokensElem(tokens, *index);
@@ -530,7 +530,7 @@ node *getStmts(token_stk_t *tokens, size_t *index, side side) {
     return glob_stmts;
 }
 
-node *getGlobStmts(token_stk_t *tokens, size_t *index, side side) {
+node *getGlobStmts(token_stk_t *tokens, size_t *index, side_t side) {
     assert(tokens && tokens->tokens && index);
 
     token_t *token = NULL;
@@ -589,7 +589,7 @@ node* getG(token_stk_t *tokens) {
     assert(root);
 
     if(tokens->tokens[index].value.keyword != KEYW_EOF) {
-        printf("WRONG TOKEN No. %llu", index);
+        printf("WRONG TOKEN No. %lu", index);
 
         assert(0);
     }

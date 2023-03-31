@@ -8,11 +8,6 @@
         return err;             \
     }
 
-
-//int NodeVerify(node *node) {
-//    return TREE_OK;
-//}
-
 static void PrintNode(const node *node, const size_t *nNode, const char color[COLORLEN], FILE *fp) {
     assert(node && nNode && color && fp);
 
@@ -20,7 +15,7 @@ static void PrintNode(const node *node, const size_t *nNode, const char color[CO
 
     switch (node->val->type) {
         case NUM_TYPE:
-            fprintf(fp, "label=\"%lg\"", node->val->value);
+            fprintf(fp, "label=\"%lg\"", node->val->value.num);
             break;
         case VAR_TYPE:
             fprintf(fp, "label=\"%s\"", node->val->value.name);
@@ -52,7 +47,7 @@ static void PrintNode(const node *node, const size_t *nNode, const char color[CO
             }
             break;
         default:
-            fprintf(fp, "label=\"%d %d\"", node->val->type, node->val->value);
+            fprintf(fp, "label=\"%d %lf\"", node->val->type, node->val->value.num);
             break;
     }
 

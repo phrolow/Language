@@ -1,6 +1,6 @@
 #include "tree.h"
 
-int NodeCtor(node *new_node, node *parent, value_t val, side side) {
+int NodeCtor(node *new_node, node *parent, value_t val, side_t side) {
     new_node->parent = parent;
     new_node->children[LEFT] = NULL;
     new_node->children[RIGHT] = NULL;

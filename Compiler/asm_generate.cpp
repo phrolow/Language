@@ -327,7 +327,7 @@ void InitCallParams(struct Node *node, struct List *NT, struct Compiler *compile
 
     GenerateExpr(node->children[LEFT], NT, compiler);
 
-    fprintf(compiler->out, "POP [rbx+%d]\n", *num_of_params);
+    fprintf(compiler->out, "POP [rbx+%lu]\n", *num_of_params);
 }
 
 void GenerateCall(struct Node *node, struct List *NT, struct Compiler *compiler) {

@@ -13,13 +13,13 @@ typedef enum SIDE {
     ROOT = -1,
     LEFT = 0,
     RIGHT = 1,
-} side;
+} side_t;
 
 typedef struct Node {
     struct Node *parent;
     struct Node *children[2];
     value_t val;
-    side side;
+    side_t side;
 } node;
 
 typedef struct Tree {
@@ -36,7 +36,7 @@ void TreeDtor(tree *tree);
 
 void SubTreeDtor(node *node);
 
-int NodeCtor(node *new_node, node *parent, value_t val, side side);
+int NodeCtor(node *new_node, node *parent, value_t val, side_t side);
 
 void NodeDtor(node *nod);
 

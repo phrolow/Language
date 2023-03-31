@@ -4,8 +4,8 @@
 #include <unistd.h>
 
 int main(int argc, char **argv) {
-    if(argc < 1) {
-        printf("Too few arguments!");
+    if(argc < 2) {
+        printf("Too few arguments!\n");
         exit(1);
     }
 

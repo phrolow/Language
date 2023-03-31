@@ -1,9 +1,7 @@
-#include "debug.h"
-
-#include "../Tree/tree.h"
+#include "tree.h"
 
 #define CHECK(cond, err, msg)   \
-    if(!(cond)) {                  \
+    if(!(cond)) {               \
         printf(msg);            \
         return err;             \
     }

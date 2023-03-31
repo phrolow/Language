@@ -19,6 +19,14 @@ const char      OP_COLOR        [COLORLEN] = "#F4CF72",
                 RIGHT_COLOR     [COLORLEN] = "#7173DC",
                 LEFT_COLOR      [COLORLEN] = "#CD5C5C";
 
+enum TREE_ERROR {
+    TREE_OK = 0,
+    NULL_NODE,
+    INVALID_LINK,
+    UNDEFINED_TYPE,
+    NULL_NAME,
+};
+
 void TreeDump(tree *tree);
 
 #endif //LANGUAGE_DEBUG_H

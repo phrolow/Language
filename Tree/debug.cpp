@@ -2,7 +2,7 @@
 
 #define CHECK(cond, err, msg)   \
     if(!(cond)) {               \
-        printf(msg);            \
+        fprintf(stderr, msg);   \
         return err;             \
     }
 
@@ -108,39 +108,30 @@ void TreeDump(tree *tree) {
 
     system("dot tree -T png -o tree.png");
 }
-//
-//static TREE_ERROR nodeverify(node *nod) {
-//    CHECK(nod, NULL_NODE, "null node")
-//
-//    CHECK(nod->parent == NULL || !(nod->parent) || nod == nod->parent->children[0] || nod == nod->parent->children[1], INVALID_LINK, "Invalid link")
-//
-//    CHECK(nod->type != NOT_DEFINED, UNDEFINED_TYPE, "undefined type")
-//
-//    CHECK(nod->type != KEYW || nod->value.keyword != WTF, UNDEFINED_OP, "not defined keyword")
-//
-//    CHECK(nod->type != VAR_TYPE || nod->value.name, NULL_NAME, "null name")
-//
-//    if(nod->children[0]) {
-//        TREE_ERROR le = nodeverify(nod->children[LEFT]);
-//        TREE_ERROR re = nodeverify(nod->children[RIGHT]);
-//
-//        if(le)
-//            return le;
-//
-//        if(re)
-//            return re;
-//    }
-//
-//    return TREE_OK;
-//}
-//
-//TREE_ERROR TreeVerify(tree *tree) {
-//#ifdef FATAL_VERIFY
-//    if(nodeverify(tree->root))
-//        abort();
-//#endif
-//
-//    //return nodeverify(tree->root);
-//
-//    return TREE_OK;
-//}
+
+static TREE_ERROR nodeverify(node *nod) {
+    CHECK(nod, NULL_NODE, "null node")
+
+    CHECK(nod->parent == NULL || nod == nod->parent->children[nod->side], INVALID_LINK, "Invalid link")
+
+    CHECK(nod->val->type != NOT_DEFINED, UNDEFINED_TYPE, "Undefined type\n")
+
+    CHECK(nod->val->type != VAR_TYPE || nod->val->value.name, NULL_NAME, "Null name\n")
+
+    if(nod->children[0]) {
+       TREE_ERROR left_err = nodeverify(nod->children[LEFT]);
+       TREE_ERROR right_err = nodeverify(nod->children[RIGHT]);
+
+       if(left_err)
+           return left_err;
+
+       if(right_err)
+           return right_err;
+    }
+
+    return TREE_OK;
+}
+
+TREE_ERROR TreeVerify(tree *tree) {
+    return nodeverify(tree->root);
+}

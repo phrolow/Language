@@ -74,4 +74,6 @@ void TokensPush(token_stk_t *tokens, const token_t *token);
 
 token_t *TokensElem(token_stk_t *tokens, size_t index);
 
+#include "tokens_debug.h"
+
 #endif //LANGUAGE_TOKENS_H

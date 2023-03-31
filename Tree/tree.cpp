@@ -36,6 +36,9 @@ static size_t numchildren(node *nod) {
 }
 
 static node *nodcpy(const node *orig, node *parent) {
+    NodeVerify(orig);
+    NodeVerify(parent);
+
     node *nod = (node*) malloc(sizeof(node));
     NodeCtor(nod, parent, orig->val, orig->side);
 
@@ -43,6 +46,8 @@ static node *nodcpy(const node *orig, node *parent) {
         nod->children[LEFT] = nodcpy(orig->children[LEFT], nod);
     if(orig->children[RIGHT])
         nod->children[RIGHT] = nodcpy(orig->children[RIGHT], nod);
+
+    NodeVerify(nod);
 
     return nod;
 }

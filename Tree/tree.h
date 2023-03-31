@@ -26,8 +26,6 @@ typedef struct Tree {
     node *root;
 } tree;
 
-#endif //LANGUAGE_TREE_H
-
 void TreeCtor(tree *tree, node *node);
 
 node* NodeCopy(node *original);
@@ -41,3 +39,7 @@ int NodeCtor(node *new_node, node *parent, value_t val, side_t side);
 void NodeDtor(node *nod);
 
 void NodeConnect(node *parent, node *child);
+
+#include "tree_debug.h"
+
+#endif //LANGUAGE_TREE_H

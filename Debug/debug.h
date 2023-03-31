@@ -1,28 +1,17 @@
 #ifndef LANGUAGE_DEBUG_H
 #define LANGUAGE_DEBUG_H
 
-#include "../Tree/tree.h"
-
-#define PRINT(n) printf("%d %d\n", (n)->type, (n)->value)
-
 const int WRONG = 0xBAD;
 
-const char* const    PNGPATH = "tree.png";
-const char* const    HTMLPATH = "log.html";
-const char* const    DOTPATH = "tree";
-
-const size_t COLORLEN = 8;
-
-const char  OP_COLOR[COLORLEN] = "#F4CF72",
-        CONST_COLOR[COLORLEN] = "#71DCC1",
-        VAR_COLOR[COLORLEN] = "#F49872",
-        MCONST_COLOR[COLORLEN] = "#B0C4DE",
-        ERR_COLOR[COLORLEN] = "#808080",
-        RIGHT_COLOR[COLORLEN] = "#7173DC",
-        LEFT_COLOR[COLORLEN] = "#CD5C5C";
-
-int NodeVerify(node *node);
-
-void TreeDump(tree *tree);
+#define PRINT(str)     { fprintf(__OUT__, "%s\n", #str                                                              );   }
+#define PRINT_LINE     { fprintf(__OUT__, "I'm at %s at line %d in %s\n", __PRETTY_FUNCTION__, __LINE__, __FILE__   );   }
+#define PRINT_(str)    { fprintf(__OUT__, "[%s:%d] %s\n",                 __PRETTY_FUNCTION__, __LINE__, #str       );   }
+#define PRINT_PTR(ptr) { fprintf(__OUT__, "[%s:%d] pointer %s at %p\n",   __PRETTY_FUNCTION__, __LINE__, #ptr,  ptr );   }
+#define PRINT_C(char)  { fprintf(__OUT__, "[%s:%d] %s = %c  \n",          __PRETTY_FUNCTION__, __LINE__, #char, char);   }
+#define PRINT_S(str)   { fprintf(__OUT__, "[%s:%d] %s = %s  \n",          __PRETTY_FUNCTION__, __LINE__, #str,  str );   }
+#define PRINT_LU(num)  { fprintf(__OUT__, "[%s:%d] %s = %lu \n",          __PRETTY_FUNCTION__, __LINE__, #num,  num );   }
+#define PRINT_D(num)   { fprintf(__OUT__, "[%s:%d] %s = %d  \n",          __PRETTY_FUNCTION__, __LINE__, #num,  num );   }
+#define PRINT_X(num)   { fprintf(__OUT__, "[%s:%d] %s = %x  \n",          __PRETTY_FUNCTION__, __LINE__, #num,  num );   }
+#define PRINT_SM(s, n) { fprintf(__OUT__, "[%s:%d] %s = %.*s\n",          __PRETTY_FUNCTION__, __LINE__, #s,    n, s);   }
 
 #endif //LANGUAGE_DEBUG_H

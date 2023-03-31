@@ -109,7 +109,7 @@ void TreeDump(tree *tree) {
     system("dot tree -T png -o tree.png");
 }
 
-static TREE_ERROR nodeverify(node *nod) {
+static TREE_ERROR nodeverify(const node *nod) {
     CHECK(nod, NULL_NODE, "null node")
 
     CHECK(nod->parent == NULL || nod == nod->parent->children[nod->side], INVALID_LINK, "Invalid link")
@@ -132,6 +132,10 @@ static TREE_ERROR nodeverify(node *nod) {
     return TREE_OK;
 }
 
-TREE_ERROR TreeVerify(tree *tree) {
+TREE_ERROR NodeVerify(const node *nod) {
+    return nodeverify(nod);
+}
+
+TREE_ERROR TreeVerify(const tree *tree) {
     return nodeverify(tree->root);
 }

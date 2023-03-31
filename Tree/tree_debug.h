@@ -27,6 +27,10 @@ enum TREE_ERROR {
     NULL_NAME,
 };
 
+TREE_ERROR NodeVerify(const node *nod);
+
+TREE_ERROR TreeVerify(const node *nod);
+
 void TreeDump(tree *tree);
 
 #endif //LANGUAGE_DEBUG_H

@@ -11,7 +11,7 @@
 #define DEF_OPER(name, num, sign) KEYW_##name = num,
 #define DEF_HELP(name, num, sign) KEYW_##name = num,
 
-const size_t NAME_MAX_LEN = 8;
+const size_t WORD_MAX_LEN = 8;
 const double TOKEN_POISON = 0xDEAD;
 const size_t MIN_CAPACITY = 0x10;
 const size_t CAPACITY_MULTIPLIER = 2;
@@ -32,16 +32,10 @@ enum KEYW {
 #undef DEF_HELP
 };
 
-enum TOKEN_ERROR {
-    NULLPTR,
-    NO_TYPE,
-    BAD_VAL,
-};
-
 union Value {
     enum KEYW keyword;
     double num;
-    char name[NAME_MAX_LEN];
+    char name[WORD_MAX_LEN];
 };
 
 struct token_t {

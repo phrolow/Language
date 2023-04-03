@@ -1,7 +1,5 @@
 #include "tokens.h"
 
-#define CHECK(cond, err) (cond) ? 0 : (err)
-
 token_t *NewToken(TYPE type, Value value) {
     token_t *token = (token_t*) malloc(sizeof(token));
 
@@ -16,14 +14,4 @@ void TokenDtor(token_t *token) {
     token->value.num = TOKEN_POISON;
 
     free(token);
-}
-
-int TokenCheck(token_t *token) {
-    int res = 0;
-
-    res |= CHECK(!token, NULLPTR);
-    res |= CHECK(token->type == NOT_DEFINED, NO_TYPE);
-    res |= CHECK(token->value.num == TOKEN_POISON, BAD_VAL);
-
-    return res;
 }

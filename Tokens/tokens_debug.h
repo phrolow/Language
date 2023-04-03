@@ -2,6 +2,7 @@
 #define LANGUAGE_TOKENS_DEBUG_H
 
 #include <stdio.h>
+#include "Debug/debug.h"
 
 enum TOKEN_ERROR {   
         TOKEN_IS_OK                = 0,
